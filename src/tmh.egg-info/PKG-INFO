@@ -1,0 +1,30 @@
+Metadata-Version: 2.1
+Name: tmh
+Version: 0.0.5
+Summary: TMH
+Home-page: https://pypi.org/project/tmh/
+Author: Birger Moell
+Author-email: bmoell@kth.se
+License: UNKNOWN
+Project-URL: Bug Tracker, https://pypi.org/project/tmh/
+Platform: UNKNOWN
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.6
+Description-Content-Type: text/markdown
+License-File: LICENSE
+
+# TMH Speech
+TMH Speech is a library that gives access to open source models for transcription.
+
+## Example usage
+'''
+from tmh import transcribe_from_audio_path
+
+file_path = "path_to_audio_file"
+output = transcribe_from_audio_path(file_path)
+print("the output is", output)
+'''
+
+

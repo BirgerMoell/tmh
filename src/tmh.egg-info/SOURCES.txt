@@ -1,0 +1,8 @@
+LICENSE
+README.md
+pyproject.toml
+setup.cfg
+src/tmh.egg-info/PKG-INFO
+src/tmh.egg-info/SOURCES.txt
+src/tmh.egg-info/dependency_links.txt
+src/tmh.egg-info/top_level.txt
