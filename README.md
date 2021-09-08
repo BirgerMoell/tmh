@@ -25,4 +25,12 @@ language = classify_language(file_path)
 print("the language is", language)
 ```
 
+### Classify emotion
+``` python
+from tmh.transcribe import classify_emotion
+file_path = "./sv.wav"
+print("classifying emotion")
+language = classify_emotion(file_path)
+print("the emotion is", language)
+```
 

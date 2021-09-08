@@ -2,6 +2,9 @@ import torchaudio
 import torch
 from itertools import groupby
 from transformers import Wav2Vec2Processor, Wav2Vec2ForCTC
+from transformers import HubertForSequenceClassification, Wav2Vec2FeatureExtractor
+from transformers import pipeline
+import librosa
 from speechbrain.pretrained import EncoderClassifier
 from typing import Any
 
@@ -13,12 +16,25 @@ model = Wav2Vec2ForCTC.from_pretrained(model_id)
 # chech language
 # enable batch mode
 
+def classify_emotion(audio_path):
+    model = HubertForSequenceClassification.from_pretrained("superb/hubert-large-superb-er")
+    feature_extractor = Wav2Vec2FeatureExtractor.from_pretrained("superb/hubert-large-superb-er")
+    speech, _ = librosa.load(audio_path, sr=16000, mono=True)
+
+    inputs = feature_extractor(speech, sampling_rate=16000, padding=True, return_tensors="pt")
+
+    logits = model(**inputs).logits
+    predicted_ids = torch.argmax(logits, dim=-1)
+    labels = [model.config.id2label[_id] for _id in predicted_ids.tolist()]
+    print(labels)
+    return(labels)
+
 def classify_language(audio_path):
     classifier = EncoderClassifier.from_hparams(source="speechbrain/lang-id-commonlanguage_ecapa", savedir="pretrained_models/lang-id-commonlanguage_ecapa")
     out_prob, score, index, text_lab = classifier.classify_file(audio_path)
     return(text_lab)
 
-def transcribe_from_audio_path(audio_path, check_language=False):
+def transcribe_from_audio_path(audio_path, check_language=False, classify_emotion=False):
     waveform, sample_rate = torchaudio.load(audio_path)
     if check_language:
         language = classify_language(audio_path)

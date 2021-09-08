@@ -2,3 +2,4 @@ transformers
 torch
 torchaudio
 speechbrain
+librosa
