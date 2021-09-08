@@ -33,4 +33,15 @@ print("classifying emotion")
 language = classify_emotion(file_path)
 print("the emotion is", language)
 ```
+## Speaker embeddings
+## https://huggingface.co/speechbrain/spkrec-xvect-voxceleb
+
+### Extract speaker embedding
+``` python
+from tmh.transcribe import extract_speaker_embedding
+file_path = "./sv.wav"
+print("extracting speaker embedding")
+embeddings = extract_speaker_embedding(file_path)
+print("the speaker embedding is", embeddings)
+```
 

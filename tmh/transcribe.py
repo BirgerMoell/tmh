@@ -7,6 +7,7 @@ from transformers import pipeline
 import librosa
 from speechbrain.pretrained import EncoderClassifier
 from typing import Any
+from pyannote.audio import Inference
 
 model_id = "KBLab/wav2vec2-large-voxrex-swedish"
 processor = Wav2Vec2Processor.from_pretrained(model_id)
@@ -15,6 +16,16 @@ model = Wav2Vec2ForCTC.from_pretrained(model_id)
 # to do 
 # chech language
 # enable batch mode
+
+## Package used for speaker embedding
+## https://github.com/pyannote/pyannote-audio/tree/develop#installation
+
+def extract_speaker_embedding(audio_path):
+    classifier = EncoderClassifier.from_hparams(source="speechbrain/spkrec-xvect-voxceleb", savedir="pretrained_models/spkrec-xvect-voxceleb")
+    signal, fs =torchaudio.load(audio_path)
+    embeddings = classifier.encode_batch(signal)
+    print(embeddings)
+    return embeddings
 
 def classify_emotion(audio_path):
     model = HubertForSequenceClassification.from_pretrained("superb/hubert-large-superb-er")

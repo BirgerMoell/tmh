@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: tmh
-Version: 0.0.11
+Version: 0.0.15
 Summary: TMH Speech package
 Home-page: https://pypi.org/project/tmh/
 Author: Birger Moell
@@ -53,6 +53,15 @@ file_path = "./sv.wav"
 print("classifying emotion")
 language = classify_emotion(file_path)
 print("the emotion is", language)
+```
+
+### Extract speaker embedding
+``` python
+from tmh.transcribe import extract_speaker_embedding
+file_path = "./sv.wav"
+print("extracting speaker embedding")
+embeddings = extract_speaker_embedding(file_path)
+print("the speaker embedding is", embeddings)
 ```
 
 
