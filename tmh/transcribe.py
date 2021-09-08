@@ -7,7 +7,6 @@ from transformers import pipeline
 import librosa
 from speechbrain.pretrained import EncoderClassifier
 from typing import Any
-from pyannote.audio import Inference
 
 model_id = "KBLab/wav2vec2-large-voxrex-swedish"
 processor = Wav2Vec2Processor.from_pretrained(model_id)
@@ -18,7 +17,6 @@ model = Wav2Vec2ForCTC.from_pretrained(model_id)
 # enable batch mode
 
 ## Package used for speaker embedding
-## https://github.com/pyannote/pyannote-audio/tree/develop#installation
 
 def extract_speaker_embedding(audio_path):
     classifier = EncoderClassifier.from_hparams(source="speechbrain/spkrec-xvect-voxceleb", savedir="pretrained_models/spkrec-xvect-voxceleb")

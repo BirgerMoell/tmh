@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: tmh
-Version: 0.0.15
+Version: 0.0.16
 Summary: TMH Speech package
 Home-page: https://pypi.org/project/tmh/
 Author: Birger Moell
@@ -54,6 +54,8 @@ print("classifying emotion")
 language = classify_emotion(file_path)
 print("the emotion is", language)
 ```
+## Speaker embeddings
+## https://huggingface.co/speechbrain/spkrec-xvect-voxceleb
 
 ### Extract speaker embedding
 ``` python
