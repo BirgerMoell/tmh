@@ -2,12 +2,16 @@ import torchaudio
 import torch
 from itertools import groupby
 from transformers import Wav2Vec2Processor, Wav2Vec2ForCTC
-from collections import namedtuple
 from typing import Any
 
 model_id = "KBLab/wav2vec2-large-voxrex-swedish"
 processor = Wav2Vec2Processor.from_pretrained(model_id)
 model = Wav2Vec2ForCTC.from_pretrained(model_id)
+
+# to do 
+# chech language
+# enable batch mode
+
 
 def transcribe_from_audio_path(audio_path):
     waveform, sample_rate = torchaudio.load(audio_path)

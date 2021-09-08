@@ -1,0 +1,1 @@
+from tmh.transcribe import transcribe_from_audio_path
