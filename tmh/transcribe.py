@@ -16,13 +16,13 @@ model = Wav2Vec2ForCTC.from_pretrained(model_id)
 def classify_language(audio_path):
     classifier = EncoderClassifier.from_hparams(source="speechbrain/lang-id-commonlanguage_ecapa", savedir="pretrained_models/lang-id-commonlanguage_ecapa")
     out_prob, score, index, text_lab = classifier.classify_file(audio_path)
-    print(text_lab)
     return(text_lab)
 
-def transcribe_from_audio_path(audio_path):
+def transcribe_from_audio_path(audio_path, check_language=False):
     waveform, sample_rate = torchaudio.load(audio_path)
-    language = classify_language(audio_path)
-    print("the language is", language)
+    if check_language:
+        language = classify_language(audio_path)
+        print("the language is", language)
     with torch.no_grad():
         #logits = model(chunk.to("cuda")).logits
         logits = model(waveform).logits
