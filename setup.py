@@ -7,7 +7,7 @@ here = os.path.abspath(os.path.dirname(__file__))
 with codecs.open(os.path.join(here, "README.md"), encoding="utf-8") as fh:
     long_description = "\n" + fh.read()
 
-VERSION = '0.0.16'
+VERSION = '0.0.17'
 DESCRIPTION = 'TMH Speech package'
 LONG_DESCRIPTION = 'A package for TMH Speach'
 
@@ -21,7 +21,7 @@ setup(
     long_description_content_type="text/markdown",
     long_description=long_description,
     packages=find_packages(),
-    install_requires=['transformers', 'torch', 'torchaudio', 'speechbrain', 'librosa'],
+    install_requires=['transformers', 'torch', 'torchaudio', 'speechbrain', 'librosa', 'pyannote.audio'],
     keywords=['python', 'speech', 'voice'],
     classifiers=[
         "Development Status :: 1 - Planning",
@@ -32,3 +32,4 @@ setup(
         "Operating System :: Microsoft :: Windows",
     ]
 )
+

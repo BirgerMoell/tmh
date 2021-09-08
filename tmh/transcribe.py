@@ -15,9 +15,6 @@ model = Wav2Vec2ForCTC.from_pretrained(model_id)
 # to do 
 # chech language
 # enable batch mode
-
-## Package used for speaker embedding
-
 def extract_speaker_embedding(audio_path):
     classifier = EncoderClassifier.from_hparams(source="speechbrain/spkrec-xvect-voxceleb", savedir="pretrained_models/spkrec-xvect-voxceleb")
     signal, fs =torchaudio.load(audio_path)

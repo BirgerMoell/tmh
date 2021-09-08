@@ -45,3 +45,12 @@ embeddings = extract_speaker_embedding(file_path)
 print("the speaker embedding is", embeddings)
 ```
 
+### Voice activity detection
+``` python
+from tmh.vad import extract_silences
+file_path = "./sv.wav"
+print("extracting silences")
+embeddings = extract_silences(file_path)
+print("the silences are", embeddings)
+```
+

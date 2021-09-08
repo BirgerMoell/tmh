@@ -3,3 +3,4 @@ torch
 torchaudio
 speechbrain
 librosa
+pyannote.audio

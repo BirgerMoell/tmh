@@ -1,11 +1,18 @@
-import webrtcvad
-vad = webrtcvad.Vad()
+from pyannote.audio.pipelines import VoiceActivityDetection
 
-def is_silent(data):
-    return vad.is_speech(data, 16000)
+pipeline = VoiceActivityDetection(segmentation="pyannote/segmentation")
 
-# Run the VAD on 10 ms of silence. The result should be False.
-sample_rate = 16000
-frame_duration = 10  # ms
-frame = b'\x00\x00' * int(sample_rate * frame_duration / 1000)
-print ('Contains speech: %s' % (vad.is_speech(frame, sample_rate)))
+HYPER_PARAMETERS = {
+  # onset/offset activation thresholds
+  "onset": 0.5, "offset": 0.5,
+  # remove speech regions shorter than that many seconds.
+  "min_duration_on": 0.0,
+  # fill non-speech regions shorter than that many seconds.
+  "min_duration_off": 0.0
+}
+
+def extract_silences(audio_path):
+    pipeline.instantiate(HYPER_PARAMETERS)
+    vad = pipeline(audio_path)
+    print(vad)
+    return(vad)
