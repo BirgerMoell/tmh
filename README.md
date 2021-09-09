@@ -73,6 +73,15 @@ embeddings = extract_silences(file_path)
 print("the silences are", embeddings)
 ```
 
+### Speech Generation
+#### Tacotron 2
+Make sure you install these packages before running tacotron 2
+```bash
+pip install numpy scipy librosa unidecode inflect librosa
+apt-get update
+apt-get install -y libsndfile1
+```
+
 ## Build instructions
 Change the version number
 
