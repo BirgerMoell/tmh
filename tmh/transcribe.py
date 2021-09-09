@@ -23,7 +23,7 @@ def extract_speaker_embedding(audio_path):
     classifier = EncoderClassifier.from_hparams(source="speechbrain/spkrec-xvect-voxceleb", savedir="pretrained_models/spkrec-xvect-voxceleb")
     signal, fs =torchaudio.load(audio_path)
     embeddings = classifier.encode_batch(signal)
-    print(embeddings)
+    # print(embeddings)
     return embeddings
 
 def classify_emotion(audio_path):
@@ -36,7 +36,7 @@ def classify_emotion(audio_path):
     logits = model(**inputs).logits
     predicted_ids = torch.argmax(logits, dim=-1)
     labels = [model.config.id2label[_id] for _id in predicted_ids.tolist()]
-    print(labels)
+    # print(labels)
     return(labels)
 
 def classify_language(audio_path):
@@ -48,7 +48,7 @@ def transcribe_from_audio_path(audio_path, language='Swedish', check_language=Fa
     waveform, sample_rate = torchaudio.load(audio_path)
     if check_language:
         language = classify_language(audio_path)
-        print("the language is", language)
+        # print("the language is", language)
     model_id = language_models[language]
     if model:
         model_id = model

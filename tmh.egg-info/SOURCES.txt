@@ -4,6 +4,7 @@ pyproject.toml
 setup.cfg
 setup.py
 tmh/__init__.py
+tmh/generate.py
 tmh/language_models.py
 tmh/transcribe.py
 tmh/transcribe_with_vad.py

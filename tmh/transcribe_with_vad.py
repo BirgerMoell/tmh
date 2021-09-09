@@ -24,8 +24,8 @@ HYPER_PARAMETERS = {
 def extract_speak_segments(audio_path):
     pipeline.instantiate(HYPER_PARAMETERS)
     vad = pipeline(audio_path)
-    print("extracting speaker segments")
-    print(vad)
+    # print("extracting speaker segments")
+    # print(vad)
     return(vad.for_json())
 
 def transcribe_from_audio_path_split_on_speech(audio_path, language="Swedish", model=""):
@@ -48,7 +48,7 @@ def transcribe_from_audio_path_split_on_speech(audio_path, language="Swedish", m
             logits = model(x).logits
         pred_ids = torch.argmax(logits, dim=-1)
         transcription = processor.batch_decode(pred_ids)
-        print(transcription)
+        # print(transcription)
 
         transcriptions.append({ 
             "transcription": transcription[0],
