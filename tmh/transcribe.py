@@ -5,9 +5,14 @@ from transformers import Wav2Vec2Processor, Wav2Vec2ForCTC
 from transformers import HubertForSequenceClassification, Wav2Vec2FeatureExtractor
 from transformers import pipeline
 import librosa
-import language_models
+
 from speechbrain.pretrained import EncoderClassifier
 from typing import Any
+
+language_models = {
+    "Swedish": "KBLab/wav2vec2-large-voxrex-swedish",
+    "English": "jonatasgrosman/wav2vec2-large-xlsr-53-english"
+}
 
 language_list = "Arabic, Basque, Breton, Catalan, Chinese_China, Chinese_Hongkong, Chinese_Taiwan, Chuvash, Czech, Dhivehi, Dutch, English, Esperanto, Estonian, French, Frisian, Georgian, German, Greek, Hakha_Chin, Indonesian, Interlingua, Italian, Japanese, Kabyle, Kinyarwanda, Kyrgyz, Latvian, Maltese, Mangolian, Persian, Polish, Portuguese, Romanian, Romansh_Sursilvan, Russian, Sakha, Slovenian, Spanish, Swedish, Tamil, Tatar, Turkish, Ukranian, Welsh"
 
@@ -44,7 +49,7 @@ def transcribe_from_audio_path(audio_path, language='Swedish', check_language=Fa
     if check_language:
         language = classify_language(audio_path)
         print("the language is", language)
-    model_id = language_models.language_models[language]
+    model_id = language_models[language]
     if model:
         model_id = model
 

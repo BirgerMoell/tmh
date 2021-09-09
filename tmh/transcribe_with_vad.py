@@ -2,14 +2,18 @@ from vad import extract_speak_segments
 import torchaudio
 import torch
 from transformers import Wav2Vec2Processor, Wav2Vec2ForCTC
-import language_models
+
+language_models = {
+    "Swedish": "KBLab/wav2vec2-large-voxrex-swedish",
+    "English": "jonatasgrosman/wav2vec2-large-xlsr-53-english"
+}
 
 def transcribe_from_audio_path_split_on_speech(audio_path, language="Swedish", model=""):
     waveform, sample_rate = torchaudio.load(audio_path)
     segments = extract_speak_segments(audio_path)
     transcriptions = []
 
-    model_id = language_models.language_models[language]
+    model_id = language_models[language]
     if model:
         model_id = model
 
