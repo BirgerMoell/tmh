@@ -5,6 +5,7 @@ setup.cfg
 setup.py
 tmh/__init__.py
 tmh/transcribe.py
+tmh/transcribe_with_vad.py
 tmh/vad.py
 tmh.egg-info/PKG-INFO
 tmh.egg-info/SOURCES.txt

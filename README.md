@@ -1,6 +1,14 @@
 # TMH Speech
 TMH Speech is a library that gives access to open source models for transcription.
 
+### Getting started
+To start the project you first need to install tmh and pyannote, since we are using newer packages.
+
+```
+pip install tmh
+pip install https://github.com/pyannote/pyannote-audio/archive/develop.zip
+```
+
 ## Example usage
 
 ### Transcription
@@ -54,3 +62,13 @@ embeddings = extract_silences(file_path)
 print("the silences are", embeddings)
 ```
 
+## Build instructions
+Change the version number
+
+```
+python3 -m build 
+twine upload --skip-existing dist/*
+```
+
+### Github
+https://gits-15.sys.kth.se/bmoell/tmh
