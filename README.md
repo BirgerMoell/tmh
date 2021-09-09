@@ -23,6 +23,17 @@ print(asr_transcription)
 print("the transcription is", transcription)
 ```
 
+### Transcribe with VAD
+``` python
+from tmh.transcribe_with_vad import transcribe_from_audio_path_split_on_speech
+file_path = "./sv.wav"
+print("creating transcription")
+asr_transcription_with_vad = transcribe_from_audio_path_split_on_speech(file_path)
+print("transcription")
+print(asr_transcription_with_vad)
+```
+
+
 ### Language classification
 ``` python
 from tmh.transcribe import classify_language
