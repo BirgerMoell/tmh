@@ -1,4 +1,4 @@
-from vad import extract_speak_segments
+# from vad import extract_speak_segments
 import torchaudio
 import torch
 from transformers import Wav2Vec2Processor, Wav2Vec2ForCTC
@@ -7,6 +7,26 @@ language_models = {
     "Swedish": "KBLab/wav2vec2-large-voxrex-swedish",
     "English": "jonatasgrosman/wav2vec2-large-xlsr-53-english"
 }
+
+from pyannote.audio.pipelines import VoiceActivityDetection
+
+pipeline = VoiceActivityDetection(segmentation="pyannote/segmentation")
+
+HYPER_PARAMETERS = {
+  # onset/offset activation thresholds
+  "onset": 0.5, "offset": 0.5,
+  # remove speech regions shorter than that many seconds.
+  "min_duration_on": 0.0,
+  # fill non-speech regions shorter than that many seconds.
+  "min_duration_off": 0.0
+}
+
+def extract_speak_segments(audio_path):
+    pipeline.instantiate(HYPER_PARAMETERS)
+    vad = pipeline(audio_path)
+    print("extracting speaker segments")
+    print(vad)
+    return(vad.for_json())
 
 def transcribe_from_audio_path_split_on_speech(audio_path, language="Swedish", model=""):
     waveform, sample_rate = torchaudio.load(audio_path)
