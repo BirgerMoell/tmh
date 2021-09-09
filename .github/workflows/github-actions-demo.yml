@@ -23,7 +23,13 @@ jobs:
         --wheel
         --outdir dist/
         .
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install setuptools wheel twine
     - name: Publish distribution 📦 to PyPI
-      uses: pypa/gh-action-pypi-publish@master
-      with:
-        password: ${{ secrets.PYPI_KEY }}
+      env:
+        TWINE_USERNAME: __token__
+        TWINE_PASSWORD: ${{ secrets.PYPI_KEY }}
+      run: |
+        twine upload --skip-existing dist/* 
