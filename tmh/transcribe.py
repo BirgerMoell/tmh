@@ -5,12 +5,11 @@ from transformers import Wav2Vec2Processor, Wav2Vec2ForCTC
 from transformers import HubertForSequenceClassification, Wav2Vec2FeatureExtractor
 from transformers import pipeline
 import librosa
+import language_models
 from speechbrain.pretrained import EncoderClassifier
 from typing import Any
 
-model_id = "KBLab/wav2vec2-large-voxrex-swedish"
-processor = Wav2Vec2Processor.from_pretrained(model_id)
-model = Wav2Vec2ForCTC.from_pretrained(model_id)
+language_list = "Arabic, Basque, Breton, Catalan, Chinese_China, Chinese_Hongkong, Chinese_Taiwan, Chuvash, Czech, Dhivehi, Dutch, English, Esperanto, Estonian, French, Frisian, Georgian, German, Greek, Hakha_Chin, Indonesian, Interlingua, Italian, Japanese, Kabyle, Kinyarwanda, Kyrgyz, Latvian, Maltese, Mangolian, Persian, Polish, Portuguese, Romanian, Romansh_Sursilvan, Russian, Sakha, Slovenian, Spanish, Swedish, Tamil, Tatar, Turkish, Ukranian, Welsh"
 
 # to do 
 # chech language
@@ -40,11 +39,17 @@ def classify_language(audio_path):
     out_prob, score, index, text_lab = classifier.classify_file(audio_path)
     return(text_lab)
 
-def transcribe_from_audio_path(audio_path, check_language=False, classify_emotion=False):
+def transcribe_from_audio_path(audio_path, language='Swedish', check_language=False, classify_emotion=False, model=""):
     waveform, sample_rate = torchaudio.load(audio_path)
     if check_language:
         language = classify_language(audio_path)
         print("the language is", language)
+    model_id = language_models.language_models[language]
+    if model:
+        model_id = model
+
+    processor = Wav2Vec2Processor.from_pretrained(model_id)
+    model = Wav2Vec2ForCTC.from_pretrained(model_id)
     with torch.no_grad():
         #logits = model(chunk.to("cuda")).logits
         logits = model(waveform).logits
@@ -72,8 +77,8 @@ def get_word_timestamps(transcription: str, predicted_ids, input_values, sample_
     print(transcription)
     print(split_ids_w_time)
 
-# file_path = "/data/asr/asr/slt/wav/t2un3016.wv1.wav"
-# output = transcribe_from_audio_path(file_path)
+file_path = "/Users/bmoell/Code/test_tanscribe/sv.wav"
+output = transcribe_from_audio_path(file_path, "English")
 # print("the output is", output)
 # transcription = "Det visste i varje fall näsan."
 # print("the transcription is", transcription)

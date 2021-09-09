@@ -11,8 +11,9 @@ HYPER_PARAMETERS = {
   "min_duration_off": 0.0
 }
 
-def extract_silences(audio_path):
+def extract_speak_segments(audio_path):
     pipeline.instantiate(HYPER_PARAMETERS)
     vad = pipeline(audio_path)
+    print("extracting speaker segments")
     print(vad)
-    return(vad)
+    return(vad.for_json())
