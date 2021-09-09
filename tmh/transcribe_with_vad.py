@@ -4,10 +4,6 @@ import torch
 from transformers import Wav2Vec2Processor, Wav2Vec2ForCTC
 import language_models
 
-model_id = "KBLab/wav2vec2-large-voxrex-swedish"
-processor = Wav2Vec2Processor.from_pretrained(model_id)
-model = Wav2Vec2ForCTC.from_pretrained(model_id)
-
 def transcribe_from_audio_path_split_on_speech(audio_path, language="Swedish", model=""):
     waveform, sample_rate = torchaudio.load(audio_path)
     segments = extract_speak_segments(audio_path)
