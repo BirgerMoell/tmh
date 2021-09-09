@@ -21,7 +21,8 @@ setup(
     long_description_content_type="text/markdown",
     long_description=long_description,
     packages=find_packages(),
-    install_requires=['transformers', 'torch', 'torchaudio', 'speechbrain', 'librosa'],
+    install_requires=['transformers', 'torch', 'torchaudio', 'speechbrain',
+                      'librosa', 'numpy', 'scipy', 'unidecode', 'inflect', 'librosa'],
     keywords=['python', 'speech', 'voice'],
     classifiers=[
         "Development Status :: 1 - Planning",
@@ -32,4 +33,3 @@ setup(
         "Operating System :: Microsoft :: Windows",
     ]
 )
-
