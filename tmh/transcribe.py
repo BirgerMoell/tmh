@@ -82,8 +82,8 @@ def get_word_timestamps(transcription: str, predicted_ids, input_values, sample_
     print(transcription)
     print(split_ids_w_time)
 
-file_path = "/Users/bmoell/Code/test_tanscribe/sv.wav"
-output = transcribe_from_audio_path(file_path, "English")
+# file_path = "/Users/bmoell/Code/test_tanscribe/sv.wav"
+# output = transcribe_from_audio_path(file_path, "English")
 # print("the output is", output)
 # transcription = "Det visste i varje fall näsan."
 # print("the transcription is", transcription)
