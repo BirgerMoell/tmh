@@ -7,10 +7,7 @@ Welcome to tmh's documentation!
 ===============================
 
 .. toctree::
-   :maxdepth: 2
-   :caption: Contents:
-
-
+   docs.md
 
 Indices and tables
 ==================
