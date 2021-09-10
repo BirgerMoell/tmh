@@ -82,6 +82,16 @@ apt-get update
 apt-get install -y libsndfile1
 ```
 
+### Codex
+Generate codex and save to file
+```
+response = generate_from_prompt('''
+A pytorch neural network model for MNIST
+'''
+)
+write_to_file(response, "generated.py")
+```
+
 ## Build instructions
 Change the version number
 
@@ -89,6 +99,8 @@ Change the version number
 python3 -m build 
 twine upload --skip-existing dist/*
 ```
+
+
 
 ### Github
 https://gits-15.sys.kth.se/bmoell/tmh

@@ -7,7 +7,7 @@ here = os.path.abspath(os.path.dirname(__file__))
 with codecs.open(os.path.join(here, "README.md"), encoding="utf-8") as fh:
     long_description = "\n" + fh.read()
 
-VERSION = '0.0.36'
+VERSION = '0.0.38'
 DESCRIPTION = 'TMH Speech package'
 LONG_DESCRIPTION = 'A package for TMH Speach'
 
@@ -22,7 +22,7 @@ setup(
     long_description=long_description,
     packages=find_packages(),
     install_requires=['transformers', 'torch', 'torchaudio', 'speechbrain',
-                      'librosa', 'numpy', 'scipy', 'unidecode', 'inflect', 'librosa'],
+                      'librosa', 'numpy', 'scipy', 'unidecode', 'inflect', 'librosa', 'python-dotenv'],
     keywords=['python', 'speech', 'voice'],
     classifiers=[
         "Development Status :: 1 - Planning",
