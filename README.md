@@ -83,8 +83,9 @@ apt-get install -y libsndfile1
 ```
 
 ### Codex
-Generate codex and save to file
+Generate code and save to file
 ```
+from tmh.code import generate_from_prompt, write_to_file
 response = generate_from_prompt('''
 A pytorch neural network model for MNIST
 '''
