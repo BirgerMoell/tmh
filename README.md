@@ -33,6 +33,14 @@ print("transcription")
 print(asr_transcription_with_vad)
 ```
 
+### Overlap detection
+```python
+from tmh.overalp import overlap_detection
+
+file_path = "./sv.wav"
+overlap = overlap_detection(audio_path)
+print(overlap)
+```
 
 ### Language classification
 ``` python
@@ -82,10 +90,31 @@ apt-get update
 apt-get install -y libsndfile1
 ```
 
+### Text generation
+You can use the text generation api to generate text based on any pretrained model from huggingface.
+
+#### Example Swedish
+
+```python
+from tmh.text import generate_text
+
+output = generate_text(model='birgermoell/swedish-gpt', prompt="AI har möjligheten att", min_length=150)
+print(output)
+```
+
+#### Example GPT-j
+
+```python
+from tmh.text import generate_text
+
+output = generate_text(model='EleutherAI/gpt-neo-2.7B', prompt="EleutherAI has", min_length=150)
+print(output)
+```
+
 ### Codex
 Generate code and save to file.
 To use
-```
+```python
 from tmh.code import generate_from_prompt, write_to_file
 response = generate_from_prompt('''
 A pytorch neural network model for MNIST
@@ -101,8 +130,6 @@ Change the version number
 python3 -m build 
 twine upload --skip-existing dist/*
 ```
-
-
 
 ### Github
 https://gits-15.sys.kth.se/bmoell/tmh

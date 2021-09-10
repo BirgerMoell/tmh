@@ -5,6 +5,6 @@ def generate_text(model='birgermoell/swedish-gpt', prompt="AI har möjligheten a
     output = generator(prompt, do_sample=True, min_length=min_length)
     return output[0]['generated_text']
     
-output = generate_text(model='birgermoell/swedish-gpt', prompt="AI har möjligheten att", min_length=150)
+# output = generate_text(model='birgermoell/swedish-gpt', prompt="AI har möjligheten att", min_length=150)
 # output = generate_text(model='EleutherAI/gpt-neo-2.7B', prompt="EleutherAI has", min_length=150)
 # print(output)
