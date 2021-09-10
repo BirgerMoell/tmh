@@ -1,6 +1,7 @@
 # from vad import extract_speak_segments
 import torchaudio
 import torch
+import librosa
 from transformers import Wav2Vec2Processor, Wav2Vec2ForCTC
 
 language_models = {
@@ -28,16 +29,17 @@ def extract_speak_segments(audio_path):
     # print(vad)
     return(vad.for_json())
 
-# def change_sample_rate(audio_path):
-#     audio = wave.open(audio_path, mode="wb")
-#     audio.setframerate(16000)
-#     return audio
-
+def change_sample_rate(audio_path, new_sample_rate=16000):
+    audio_to_resample, sr = librosa.load(audio_path)
+    resampled_audio = librosa.resample(audio_to_resample, sr, new_sample_rate)
+    return resampled_audio
 
 def transcribe_from_audio_path_split_on_speech(audio_path, language="Swedish", model=""):
     waveform, sample_rate = torchaudio.load(audio_path)
     if sample_rate != 16000:
-        raise ValueError("sample rate must be 16000")
+        ## change sample rate to 16000
+        waveform = change_sample_rate(audio_path)
+        sample_rate = 16000
 
     segments = extract_speak_segments(audio_path)
     transcriptions = []
