@@ -64,7 +64,8 @@ language = classify_emotion(file_path)
 print("the emotion is", language)
 ```
 ## Speaker embeddings
-## https://huggingface.co/speechbrain/spkrec-xvect-voxceleb
+The speaker embeddings are made using the following library
+https://huggingface.co/speechbrain/spkrec-xvect-voxceleb
 
 ### Extract speaker embedding
 ``` python
