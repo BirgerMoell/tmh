@@ -28,8 +28,17 @@ def extract_speak_segments(audio_path):
     # print(vad)
     return(vad.for_json())
 
+# def change_sample_rate(audio_path):
+#     audio = wave.open(audio_path, mode="wb")
+#     audio.setframerate(16000)
+#     return audio
+
+
 def transcribe_from_audio_path_split_on_speech(audio_path, language="Swedish", model=""):
     waveform, sample_rate = torchaudio.load(audio_path)
+    if sample_rate != 16000:
+        raise ValueError("sample rate must be 16000")
+
     segments = extract_speak_segments(audio_path)
     transcriptions = []
 

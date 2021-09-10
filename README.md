@@ -83,7 +83,8 @@ apt-get install -y libsndfile1
 ```
 
 ### Codex
-Generate code and save to file
+Generate code and save to file.
+To use
 ```
 from tmh.code import generate_from_prompt, write_to_file
 response = generate_from_prompt('''

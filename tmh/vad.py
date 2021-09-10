@@ -17,3 +17,5 @@ def extract_speak_segments(audio_path):
     print("extracting speaker segments")
     print(vad)
     return(vad.for_json())
+
+
