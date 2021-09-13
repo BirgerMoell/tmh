@@ -53,7 +53,7 @@ def classify_language(audio_path):
 def transcribe_from_audio_path(audio_path, language='Swedish', check_language=False, classify_emotion=False, model=""):
     waveform, sample_rate = torchaudio.load(audio_path)
     if sample_rate != 16000:
-        change_sample_rate(audio_path)
+        waveform = change_sample_rate(audio_path)
         sample_rate = 16000
     if check_language:
         language = classify_language(audio_path)
