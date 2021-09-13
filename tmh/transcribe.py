@@ -42,7 +42,7 @@ def classify_emotion(audio_path):
 def classify_language(audio_path):
     classifier = EncoderClassifier.from_hparams(source="speechbrain/lang-id-commonlanguage_ecapa", savedir="pretrained_models/lang-id-commonlanguage_ecapa")
     out_prob, score, index, text_lab = classifier.classify_file(audio_path)
-    return(text_lab)
+    return(text_lab[0])
 
 def transcribe_from_audio_path(audio_path, language='Swedish', check_language=False, classify_emotion=False, model=""):
     waveform, sample_rate = torchaudio.load(audio_path)
