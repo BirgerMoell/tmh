@@ -5,11 +5,6 @@ import librosa
 from transformers import Wav2Vec2Processor, Wav2Vec2ForCTC
 import json
 
-language_models = {
-    "Swedish": "KBLab/wav2vec2-large-voxrex-swedish",
-    "English": "jonatasgrosman/wav2vec2-large-xlsr-53-english"
-}
-
 from pyannote.audio.pipelines import VoiceActivityDetection
 from language_models import language_models
 
