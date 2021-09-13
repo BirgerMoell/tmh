@@ -9,7 +9,7 @@ import librosa
 from speechbrain.pretrained import EncoderClassifier
 from typing import Any
 
-from language_files import language_models
+import language_files
 
 # to do 
 # chech language
@@ -53,7 +53,7 @@ def transcribe_from_audio_path(audio_path, language='Swedish', check_language=Fa
     if check_language:
         language = classify_language(audio_path)
         # print("the language is", language)
-    model_id = language_models[language]
+    model_id = language_files.language_models[language]
     if model:
         model_id = model
 
