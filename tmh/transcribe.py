@@ -9,12 +9,7 @@ import librosa
 from speechbrain.pretrained import EncoderClassifier
 from typing import Any
 
-language_models = {
-    "Swedish": "KBLab/wav2vec2-large-voxrex-swedish",
-    "English": "jonatasgrosman/wav2vec2-large-xlsr-53-english"
-}
-
-language_list = "Arabic, Basque, Breton, Catalan, Chinese_China, Chinese_Hongkong, Chinese_Taiwan, Chuvash, Czech, Dhivehi, Dutch, English, Esperanto, Estonian, French, Frisian, Georgian, German, Greek, Hakha_Chin, Indonesian, Interlingua, Italian, Japanese, Kabyle, Kinyarwanda, Kyrgyz, Latvian, Maltese, Mangolian, Persian, Polish, Portuguese, Romanian, Romansh_Sursilvan, Russian, Sakha, Slovenian, Spanish, Swedish, Tamil, Tatar, Turkish, Ukranian, Welsh"
+from language_models import language_models
 
 # to do 
 # chech language

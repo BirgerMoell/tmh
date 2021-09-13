@@ -11,6 +11,7 @@ language_models = {
 }
 
 from pyannote.audio.pipelines import VoiceActivityDetection
+from language_models import language_models
 
 pipeline = VoiceActivityDetection(segmentation="pyannote/segmentation")
 
@@ -58,7 +59,6 @@ def transcribe_from_audio_path_split_on_speech(audio_path, language="Swedish", m
         
         x = waveform[:,int(segment['segment']['start']*sample_rate): int(segment['segment']['end']*sample_rate)]
         with torch.no_grad():
-            #logits = model(chunk.to("cuda")).logits
             logits = model(x).logits
         pred_ids = torch.argmax(logits, dim=-1)
         transcription = processor.batch_decode(pred_ids)
