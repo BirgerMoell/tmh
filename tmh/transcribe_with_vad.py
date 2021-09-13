@@ -32,7 +32,8 @@ def extract_speak_segments(audio_path):
 def change_sample_rate(audio_path, new_sample_rate=16000):
     audio_to_resample, sr = librosa.load(audio_path)
     resampled_audio = librosa.resample(audio_to_resample, sr, new_sample_rate)
-    return resampled_audio
+    resampled_tensor = torch.tensor([resampled_audio])
+    return resampled_tensor
 
 def transcribe_from_audio_path_split_on_speech(audio_path, language="Swedish", model=""):
     waveform, sample_rate = torchaudio.load(audio_path)
@@ -42,6 +43,7 @@ def transcribe_from_audio_path_split_on_speech(audio_path, language="Swedish", m
         sample_rate = 16000
 
     segments = extract_speak_segments(audio_path)
+    #print("are the segements working", segments)
     transcriptions = []
 
     model_id = language_models[language]
@@ -68,6 +70,6 @@ def transcribe_from_audio_path_split_on_speech(audio_path, language="Swedish", m
         })
     return transcriptions
 
-# file_path = "/Users/bmoell/Code/test_tanscribe/sv.wav"
-# output = transcribe_from_audio_path_split_on_speech(file_path, "Swedish")
+# file_path = "./test.wav"
+# output = transcribe_from_audio_path_split_on_speech(file_path, "English")
 # print(output)
