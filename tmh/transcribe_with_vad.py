@@ -6,7 +6,8 @@ from transformers import Wav2Vec2Processor, Wav2Vec2ForCTC
 import json
 
 from pyannote.audio.pipelines import VoiceActivityDetection
-from language_models import language_models
+from language_files import language_models
+
 
 pipeline = VoiceActivityDetection(segmentation="pyannote/segmentation")
 

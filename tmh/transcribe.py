@@ -9,7 +9,7 @@ import librosa
 from speechbrain.pretrained import EncoderClassifier
 from typing import Any
 
-from language_models import language_models
+from language_files import language_models
 
 # to do 
 # chech language
