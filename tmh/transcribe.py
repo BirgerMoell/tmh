@@ -21,6 +21,12 @@ def extract_speaker_embedding(audio_path):
     # print(embeddings)
     return embeddings
 
+def change_sample_rate(audio_path, new_sample_rate=16000):
+    audio_to_resample, sr = librosa.load(audio_path)
+    resampled_audio = librosa.resample(audio_to_resample, sr, new_sample_rate)
+    resampled_tensor = torch.tensor([resampled_audio])
+    return resampled_tensor
+
 def classify_emotion(audio_path):
     model = HubertForSequenceClassification.from_pretrained("superb/hubert-large-superb-er")
     feature_extractor = Wav2Vec2FeatureExtractor.from_pretrained("superb/hubert-large-superb-er")
@@ -37,10 +43,13 @@ def classify_emotion(audio_path):
 def classify_language(audio_path):
     classifier = EncoderClassifier.from_hparams(source="speechbrain/lang-id-commonlanguage_ecapa", savedir="pretrained_models/lang-id-commonlanguage_ecapa")
     out_prob, score, index, text_lab = classifier.classify_file(audio_path)
-    return(text_lab)
+    return(text_lab[0])
 
 def transcribe_from_audio_path(audio_path, language='Swedish', check_language=False, classify_emotion=False, model=""):
     waveform, sample_rate = torchaudio.load(audio_path)
+    if sample_rate != 16000:
+        change_sample_rate(audio_path)
+        sample_rate = 16000
     if check_language:
         language = classify_language(audio_path)
         # print("the language is", language)
