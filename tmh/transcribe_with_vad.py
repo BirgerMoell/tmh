@@ -6,7 +6,7 @@ from transformers import Wav2Vec2Processor, Wav2Vec2ForCTC
 import json
 
 from pyannote.audio.pipelines import VoiceActivityDetection
-import language_files
+from language_files import get_model
 
 pipeline = VoiceActivityDetection(segmentation="pyannote/segmentation")
 
@@ -43,7 +43,7 @@ def transcribe_from_audio_path_split_on_speech(audio_path, language="Swedish", m
     #print("are the segements working", segments)
     transcriptions = []
 
-    model_id = language_files.language_models[language]
+    model_id = get_model(language)
     if model:
         model_id = model
 

@@ -1,4 +1,5 @@
-language_models = {
+
+language_files = {
     "Swedish": "KBLab/wav2vec2-large-voxrex-swedish",
     "English": "jonatasgrosman/wav2vec2-large-xlsr-53-english",
     "Russian": "jonatasgrosman/wav2vec2-large-xlsr-53-russian",
@@ -30,7 +31,9 @@ language_models = {
     "Lithuanian": "DeividasM/wav2vec2-large-xlsr-53-lithuanian",
     "Hungarian": "jonatasgrosman/wav2vec2-large-xlsr-53-hungarian",
     "Finnish": "aapot/wav2vec2-large-xlsr-53-finnish"
-}
+    }
 
+def get_model(language):
+    return language_files[language]
 
 language_list = "Arabic, Basque, Breton, Catalan, Chinese_China, Chinese_Hongkong, Chinese_Taiwan, Chuvash, Czech, Dhivehi, Dutch, English, Esperanto, Estonian, French, Frisian, Georgian, German, Greek, Hakha_Chin, Indonesian, Interlingua, Italian, Japanese, Kabyle, Kinyarwanda, Kyrgyz, Latvian, Maltese, Mangolian, Persian, Polish, Portuguese, Romanian, Romansh_Sursilvan, Russian, Sakha, Slovenian, Spanish, Swedish, Tamil, Tatar, Turkish, Ukranian, Welsh"
