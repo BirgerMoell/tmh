@@ -139,4 +139,4 @@ twine upload --skip-existing dist/*
 https://tmh-docs.readthedocs.io/en/latest/docs.html#getting-started
 
 ### Github
-https://gits-15.sys.kth.se/bmoell/tmh
+https://github.com/BirgerMoell/tmh
