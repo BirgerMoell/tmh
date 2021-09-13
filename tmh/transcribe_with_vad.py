@@ -3,6 +3,7 @@ import torchaudio
 import torch
 import librosa
 from transformers import Wav2Vec2Processor, Wav2Vec2ForCTC
+import json
 
 language_models = {
     "Swedish": "KBLab/wav2vec2-large-voxrex-swedish",
@@ -35,7 +36,7 @@ def change_sample_rate(audio_path, new_sample_rate=16000):
     resampled_tensor = torch.tensor([resampled_audio])
     return resampled_tensor
 
-def transcribe_from_audio_path_split_on_speech(audio_path, language="Swedish", model=""):
+def transcribe_from_audio_path_split_on_speech(audio_path, language="Swedish", model="", save_to_file=""):
     waveform, sample_rate = torchaudio.load(audio_path)
     if sample_rate != 16000:
         ## change sample rate to 16000
@@ -63,11 +64,18 @@ def transcribe_from_audio_path_split_on_speech(audio_path, language="Swedish", m
         transcription = processor.batch_decode(pred_ids)
         # print(transcription)
 
-        transcriptions.append({ 
+        full_transcript = {   
             "transcription": transcription[0],
             "start": segment['segment']['start'],
             "end": segment['segment']['end']
-        })
+        }
+
+        transcriptions.append(full_transcript)
+        if (save_to_file):
+            f = open(save_to_file, "a")
+            f.write(json.dumps(full_transcript))
+            f.close()
+
     return transcriptions
 
 # file_path = "./test.wav"
