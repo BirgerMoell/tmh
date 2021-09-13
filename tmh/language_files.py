@@ -1,5 +1,5 @@
 
-language_files = {
+language_dict = {
     "Swedish": "KBLab/wav2vec2-large-voxrex-swedish",
     "English": "jonatasgrosman/wav2vec2-large-xlsr-53-english",
     "Russian": "jonatasgrosman/wav2vec2-large-xlsr-53-russian",
@@ -34,6 +34,6 @@ language_files = {
     }
 
 def get_model(language):
-    return language_files[language]
+    return language_dict[language]
 
 language_list = "Arabic, Basque, Breton, Catalan, Chinese_China, Chinese_Hongkong, Chinese_Taiwan, Chuvash, Czech, Dhivehi, Dutch, English, Esperanto, Estonian, French, Frisian, Georgian, German, Greek, Hakha_Chin, Indonesian, Interlingua, Italian, Japanese, Kabyle, Kinyarwanda, Kyrgyz, Latvian, Maltese, Mangolian, Persian, Polish, Portuguese, Romanian, Romansh_Sursilvan, Russian, Sakha, Slovenian, Spanish, Swedish, Tamil, Tatar, Turkish, Ukranian, Welsh"
