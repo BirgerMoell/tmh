@@ -136,3 +136,4 @@ dmypy.json
 tmh/pipeline/
 
 .DS_Store
+*.pt

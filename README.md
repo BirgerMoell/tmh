@@ -85,6 +85,16 @@ embeddings = extract_silences(file_path)
 print("the silences are", embeddings)
 ```
 
+### Phonemes
+Please download this model and put it in your current folder to be able to run the model
+https://public-asai-dl-models.s3.eu-central-1.amazonaws.com/DeepPhonemizer/en_us_cmudict_ipa_forward.pt
+The model assumes that the model is stored at ./en_us_cmudict_ipa_forward.pt (you can change the model checkpoint param to save to another location)
+```python
+from tmh.phonemes import get_phonemes
+phonemes = get_phonemes("I'm eating a cake", model_checkpoint='./en_us_cmudict_ipa_forward.pt')
+print(phonemes)
+```
+
 ### Speech Generation
 #### Tacotron 2
 Make sure you install these packages before running tacotron 2
