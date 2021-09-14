@@ -42,8 +42,7 @@ language_dict = {
     "Kinyarwanda": "lucio/wav2vec2-large-xlsr-kinyarwanda",
     "Lithuanian": "DeividasM/wav2vec2-large-xlsr-53-lithuanian",
     "Hungarian": "jonatasgrosman/wav2vec2-large-xlsr-53-hungarian",
-    "Finnish": "aapot/wav2vec2-large-xlsr-53-finnish",
-    "Arabic": "asafaya/bert-base-arabic"
+    "Finnish": "aapot/wav2vec2-large-xlsr-53-finnish"
     }
 
 # to do 
@@ -92,7 +91,7 @@ def transcribe_from_audio_path(audio_path, language='Swedish', check_language=Fa
         try:
             model_id = language_dict[language]
         except KeyError:
-            print("No language model found for %s." %language)
+            print("No language model found for %s. Defaulting to KBLab/wav2vec2-large-voxrex-swedish unless another model was specified." %language)
             model_id = "KBLab/wav2vec2-large-voxrex-swedish"
     if model:
         model_id = model
