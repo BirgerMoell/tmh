@@ -42,7 +42,8 @@ language_dict = {
     "Kinyarwanda": "lucio/wav2vec2-large-xlsr-kinyarwanda",
     "Lithuanian": "DeividasM/wav2vec2-large-xlsr-53-lithuanian",
     "Hungarian": "jonatasgrosman/wav2vec2-large-xlsr-53-hungarian",
-    "Finnish": "aapot/wav2vec2-large-xlsr-53-finnish"
+    "Finnish": "aapot/wav2vec2-large-xlsr-53-finnish",
+    "Arabic": "asafaya/bert-base-arabic"
     }
 
 
