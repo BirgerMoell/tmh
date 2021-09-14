@@ -79,7 +79,11 @@ def transcribe_from_audio_path_split_on_speech(audio_path, language="Swedish", m
     #print("are the segements working", segments)
     transcriptions = []
 
-    model_id = language_dict[language]
+    try:
+        model_id = language_dict[language]
+    except KeyError:
+        print("No language model found for %s." %language)
+        
     if model:
         model_id = model
 
