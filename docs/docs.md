@@ -76,6 +76,25 @@ embeddings = extract_speaker_embedding(file_path)
 print("the speaker embedding is", embeddings)
 ```
 
+### Extract audio embedding
+Audio embeddings using wav2vec2
+https://arxiv.org/abs/2006.11477
+or hubert (default) https://arxiv.org/abs/2106.07447
+can be used.
+
+Note that embeddings that are not trained for ASR (using CTC) usually have better performance on classification tasks.
+
+https://arxiv.org/pdf/2104.03502v1.pdf
+
+From the paper, "when the model is finetuned for an ASR task, information that is not relevant for that task but might be relevant for speech emotion recognition is lost from the embeddings. For example, information about the pitch might not be important for speech recognition, while it is essential for speech emotion recognition."
+
+
+``` python
+from tmh.audio_embeddings import extract_audio_embeddings
+audio_embeddings = get_audio_embeddings('/Users/bmoell/Code/test_tanscribe/sv.wav')
+print(audio_embeddings)
+```
+
 ### Voice activity detection
 ``` python
 from tmh.vad import extract_silences
