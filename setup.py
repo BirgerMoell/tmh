@@ -15,7 +15,7 @@ LONG_DESCRIPTION = 'A package for TMH Speach'
 setup(
     name="tmh",
     version=VERSION,
-    author="Birger Moell, Ambika Kirkland",
+    author="Birger Moell, Ambika Kirkland, Johan Boye",
     author_email="<bmoell@kth.se>",
     description=DESCRIPTION,
     long_description_content_type="text/markdown",

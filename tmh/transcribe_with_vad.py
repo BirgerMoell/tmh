@@ -125,7 +125,7 @@ def transcribe_from_audio_path_split_on_speech(audio_path, language="Swedish", m
                             indent=4,
                             ensure_ascii=False).encode('utf8').decode()
     elif output_format == 'srt' :
-        for item in transcription :
+        for item in transcriptions :
             transcription = item['transcription']
             start = item['start']
             end = item['end']
