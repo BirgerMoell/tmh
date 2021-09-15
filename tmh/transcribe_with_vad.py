@@ -69,22 +69,34 @@ def change_sample_rate(audio_path, new_sample_rate=16000):
     resampled_tensor = torch.tensor([resampled_audio])
     return resampled_tensor
 
-def transcribe_from_audio_path_split_on_speech(audio_path, language="Swedish", model="", save_to_file=""):
+
+def transcribe_from_audio_path_split_on_speech(audio_path, language="Swedish", model="", save_to_file="", output_format="json"):
+    """
+    Creates a transcription of an audio file, and outputs the
+    result in one of the formats json (which is the default),
+    or srt.
+
+    If the 'save_to_file' parameter is set to a file name, the
+    results will also be written to file. 
+
+    The srt format can be used to create accurately timed subtitles 
+    for videos. If 'audio_path' is the audio track of a video file, 
+    a video player like VLC will create those subtitles automatically, 
+    given a file in the srt format.
+    """
     waveform, sample_rate = torchaudio.load(audio_path)
     if sample_rate != 16000:
         ## change sample rate to 16000
         waveform = change_sample_rate(audio_path)
         sample_rate = 16000
-
     segments = extract_speak_segments(audio_path)
-    #print("are the segements working", segments)
     transcriptions = []
 
     try:
         model_id = language_dict[language]
     except KeyError:
         print("No language model found for %s." %language)
-        
+
     if model:
         model_id = model
 
@@ -92,27 +104,57 @@ def transcribe_from_audio_path_split_on_speech(audio_path, language="Swedish", m
     model = Wav2Vec2ForCTC.from_pretrained(model_id)
 
     for segment in segments['content']:
-        
         x = waveform[:,int(segment['segment']['start']*sample_rate): int(segment['segment']['end']*sample_rate)]
         with torch.no_grad():
             logits = model(x).logits
         pred_ids = torch.argmax(logits, dim=-1)
         transcription = processor.batch_decode(pred_ids)
-        # print(transcription)
-
         full_transcript = {   
-            "transcription": transcription[0],
+            "transcription": transcription[0].encode('utf8').decode(),
             "start": segment['segment']['start'],
             "end": segment['segment']['end']
         }
-
         transcriptions.append(full_transcript)
-        if (save_to_file):
-            f = open(save_to_file, "a")
-            f.write(json.dumps(full_transcript))
-            f.close()
 
-    return transcriptions
+    d = {}
+    d['transcripts'] = transcriptions
+    result = ""
+    if output_format == 'json' :
+        result = json.dumps(d,
+                            sort_keys=False,
+                            indent=4,
+                            ensure_ascii=False).encode('utf8').decode()
+    elif output_format == 'srt' :
+        for item in transcription :
+            transcription = item['transcription']
+            start = item['start']
+            end = item['end']
+            result += str(subtitle_id)
+            result += '\n'
+            result += time_format(start)
+            result += ' --> '
+            result += time_format(end)
+            result += '\n'
+            result += transcription
+            result += '\n\n'
+    if save_to_file :
+        f = open(save_to_file, "w")
+        f.write( result )
+        f.close()
+    return result
+
+                       
+def time_format( t ) :
+    """
+    Produces the time format expected by the srt format,
+    given a parameter t representing a number of seconds.
+    """
+    hours = int(t/3600)
+    minutes = int((t-hours*3600)/60)
+    seconds = int(t-hours*3600-minutes*60)
+    fraction = int((t%1)*100)
+    return str(hours) + ":" + str(minutes) + ":" + str(seconds) + "." + str(fraction)
+
 
 # file_path = "./test.wav"
 # output = transcribe_from_audio_path_split_on_speech(file_path, "English")
