@@ -11,4 +11,4 @@ def get_phonemes(text, model_checkpoint='./en_us_cmudict_ipa_forward.pt'):
     # print(phonemes)
     return phonemes
 
-get_phonemes("I'm eating a cake")
+# get_phonemes("I'm eating a cake")
