@@ -104,13 +104,15 @@ apt-get update
 apt-get install -y libsndfile1
 ```
 
+## Text
+
 ### Text generation
 You can use the text generation api to generate text based on any pretrained model from huggingface.
 
 #### Example Swedish
 
 ```python
-from tmh.text import generate_text
+from tmh.text.text_generation import generate_text
 
 output = generate_text(model='birgermoell/swedish-gpt', prompt="AI har möjligheten att", min_length=150)
 print(output)
@@ -119,10 +121,28 @@ print(output)
 #### Example GPT-j
 
 ```python
-from tmh.text import generate_text
+from from tmh.text.text_generation import generate_text import generate_text
 
 output = generate_text(model='EleutherAI/gpt-neo-2.7B', prompt="EleutherAI has", min_length=150)
 print(output)
+```
+
+### Text Embeddings
+
+```python
+from tmh.text.get_embeddings import get_bert_embedding_from_text
+
+embedding = get_bert_embedding_from_text("Hej, jag gillar glass", model="KB/bert-base-swedish-cased")
+print(embedding)
+```
+
+### Named Entity Recognition
+
+```python
+from tmh.text.ner import named_entity_recognition
+
+ner = named_entity_recognition('KTH är ett universitet i Stockholm')
+print(ner)
 ```
 
 ### Codex

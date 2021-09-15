@@ -42,6 +42,9 @@ model = keras.models.load_model('./modelMix4.h5')
 print(model)
 
 x = load_wav("../sample_input/1_1.wav")
+
+# figure out how to make it five dimensional
+
 import pdb
 pdb.set_trace()
 print(x)
