@@ -1,6 +1,9 @@
 # TMH Speech
 TMH Speech is a library that gives access to open source models for transcription.
 
+## Read the docs
+https://tmh-docs.readthedocs.io/en/latest/docs.html#getting-started
+
 ### Getting started
 To start the project you first need to install tmh and pyannote, since we are using newer packages.
 
@@ -64,7 +67,6 @@ print("the emotion is", language)
 The speaker embeddings are made using the following library
 https://huggingface.co/speechbrain/spkrec-xvect-voxceleb
 
-
 ### Extract speaker embedding
 ``` python
 from tmh.transcribe import extract_speaker_embedding
@@ -83,6 +85,16 @@ embeddings = extract_silences(file_path)
 print("the silences are", embeddings)
 ```
 
+### Phonemes
+Please download this model and put it in your current folder to be able to run the model
+https://public-asai-dl-models.s3.eu-central-1.amazonaws.com/DeepPhonemizer/en_us_cmudict_ipa_forward.pt
+The model assumes that the model is stored at ./en_us_cmudict_ipa_forward.pt (you can change the model checkpoint param to save to another location)
+```python
+from tmh.phonemes import get_phonemes
+phonemes = get_phonemes("I'm eating a cake", model_checkpoint='./en_us_cmudict_ipa_forward.pt')
+print(phonemes)
+```
+
 ### Speech Generation
 #### Tacotron 2
 Make sure you install these packages before running tacotron 2
@@ -92,13 +104,15 @@ apt-get update
 apt-get install -y libsndfile1
 ```
 
+## Text
+
 ### Text generation
 You can use the text generation api to generate text based on any pretrained model from huggingface.
 
 #### Example Swedish
 
 ```python
-from tmh.text import generate_text
+from tmh.text.text_generation import generate_text
 
 output = generate_text(model='birgermoell/swedish-gpt', prompt="AI har möjligheten att", min_length=150)
 print(output)
@@ -107,10 +121,101 @@ print(output)
 #### Example GPT-j
 
 ```python
-from tmh.text import generate_text
+from from tmh.text.text_generation import generate_text import generate_text
 
 output = generate_text(model='EleutherAI/gpt-neo-2.7B', prompt="EleutherAI has", min_length=150)
 print(output)
+```
+
+### Text Embeddings
+
+```python
+from tmh.text.get_embeddings import get_bert_embedding_from_text
+
+embedding = get_bert_embedding_from_text("Hej, jag gillar glass", model="KB/bert-base-swedish-cased")
+print(embedding)
+```
+
+### Named Entity Recognition
+
+```python
+from tmh.text.ner import named_entity_recognition
+
+ner = named_entity_recognition('KTH är ett universitet i Stockholm')
+print(ner)
+```
+### Question Answering
+
+```python
+from tmh.text.question_answering import get_answer
+
+answer = get_answer({'question': 'What is the meaning of life', 'context': 'The meaning of life is to be happy'})
+print(answer)
+```
+
+### Translation
+
+```python
+from tmh.text.translate import translate_text
+
+sv_text = "Albert Einstein var son till Hermann och Pauline Einstein, vilka var icke-religiösa judar och tillhörde medelklassen. Fadern var försäljare och drev senare en elektroteknisk fabrik. Familjen bosatte sig 1880 i München där Einstein gick i en katolsk skola. Mängder av myter cirkulerar om Albert Einsteins person. En av dessa är att han som barn skulle ha haft svårigheter med matematik, vilket dock motsägs av hans utmärkta betyg i ämnet.[15] Han nämnde ofta senare att han inte trivdes i skolan på grund av dess pedagogik. Att Albert Einstein skulle vara släkt med musikvetaren Alfred Einstein är ett, ofta framfört, obevisat påstående. Alfred Einsteins dotter Eva har framhållit att något sådant släktskap inte existerar."
+
+translation = translate_text(sv_text)
+print(translation)
+```
+
+### Zero Shot Classification
+
+```python
+from tmh.text.zero_shot import get_zero_shot_classification
+
+sequence_to_classify = "one day I will see the world"
+candidate_labels = ['travel', 'cooking', 'dancing']
+classified_label = get_zero_shot_classification(sequence_to_classify, candidate_labels)
+print(classified_label)
+```
+### Summary
+
+```python
+from tmh.text.summarization import get_summary
+
+ARTICLE = """ New York (CNN)When Liana Barrientos was 23 years old, she got married in Westchester County, New York.
+ A year later, she got married again in Westchester County, but to a different man and without divorcing her first husband.
+ Only 18 days after that marriage, she got hitched yet again. Then, Barrientos declared "I do" five more times, sometimes only within two weeks of each other.
+ In 2010, she married once more, this time in the Bronx. In an application for a marriage license, she stated it was her "first and only" marriage.
+ Barrientos, now 39, is facing two criminal counts of "offering a false instrument for filing in the first degree," referring to her false statements on the
+ 2010 marriage license application, according to court documents.
+ Prosecutors said the marriages were part of an immigration scam.
+ On Friday, she pleaded not guilty at State Supreme Court in the Bronx, according to her attorney, Christopher Wright, who declined to comment further.
+ After leaving court, Barrientos was arrested and charged with theft of service and criminal trespass for allegedly sneaking into the New York subway through an emergency exit, said Detective
+ Annette Markowski, a police spokeswoman. In total, Barrientos has been married 10 times, with nine of her marriages occurring between 1999 and 2002.
+ All occurred either in Westchester County, Long Island, New Jersey or the Bronx. She is believed to still be married to four men, and at one time, she was married to eight men at once, prosecutors say.
+ Prosecutors said the immigration scam involved some of her husbands, who filed for permanent residence status shortly after the marriages.
+ Any divorces happened only after such filings were approved. It was unclear whether any of the men will be prosecuted.
+ The case was referred to the Bronx District Attorney\'s Office by Immigration and Customs Enforcement and the Department of Homeland Security\'s
+ Investigation Division. Seven of the men are from so-called "red-flagged" countries, including Egypt, Turkey, Georgia, Pakistan and Mali.
+ Her eighth husband, Rashid Rajput, was deported in 2006 to his native Pakistan after an investigation by the Joint Terrorism Task Force.
+ If convicted, Barrientos faces up to four years in prison.  Her next court appearance is scheduled for May 18.
+ """
+
+sum = get_summary(ARTICLE)
+print(sum)
+```
+### Sentiment Analysis
+
+```python
+from tmh.text.sentiment_analysis import get_sentiment
+
+sentiment = get_sentiment("Robots are the best")
+print(sentiment)
+```
+### Emotion classification
+
+```python
+from tmh.text.sentiment_analysis import get_emotion
+
+emotion = get_emotion("i feel as if i havent blogged in ages are at least truly blogged i am doing an update cute")
+print(emotion)
 ```
 
 ### Codex
@@ -134,7 +239,7 @@ twine upload --skip-existing dist/*
 ```
 
 ### Read the docs
-https://tmh-docs.readthedocs.io/en/latest/
+https://tmh-docs.readthedocs.io/en/latest/docs.html#getting-started
 
 ### Github
-https://gits-15.sys.kth.se/bmoell/tmh
+https://github.com/BirgerMoell/tmh
