@@ -7,7 +7,7 @@ here = os.path.abspath(os.path.dirname(__file__))
 with codecs.open(os.path.join(here, "README.md"), encoding="utf-8") as fh:
     long_description = "\n" + fh.read()
 
-VERSION = '0.0.59'
+VERSION = '0.0.60'
 DESCRIPTION = 'TMH Speech package'
 LONG_DESCRIPTION = 'A package for TMH Speach'
 
@@ -15,7 +15,7 @@ LONG_DESCRIPTION = 'A package for TMH Speach'
 setup(
     name="tmh",
     version=VERSION,
-    author="Birger Moell, Ambika Kirkland",
+    author="Birger Moell, Ambika Kirkland, Johan Boye",
     author_email="<bmoell@kth.se>",
     description=DESCRIPTION,
     long_description_content_type="text/markdown",
