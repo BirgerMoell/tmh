@@ -38,7 +38,7 @@ print(asr_transcription_with_vad)
 
 ### Overlap detection
 ```python
-from tmh.overalp import overlap_detection
+from tmh.overlap import overlap_detection
 
 file_path = "./sv.wav"
 overlap = overlap_detection(audio_path)
