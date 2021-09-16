@@ -22,12 +22,12 @@ def list_models():
     return models
 
 
-def translate_and_generate(swedish_short_text):
+def translate_and_generate(swedish_short_text, min_length=50):
 
     english_short_text = translate_between_languages(swedish_short_text, "Helsinki-NLP/opus-mt-sv-en")
     # print("the long english text is", english_long_text)
 
-    english_generation = generate_text(model='EleutherAI/gpt-neo-2.7B', prompt=english_short_text)
+    english_generation = generate_text(model='EleutherAI/gpt-neo-2.7B', prompt=english_short_text, min_length=min_length)
     # print("the english summary is", english_summary)
 
     swedish_generation = translate_between_languages(english_generation, "Helsinki-NLP/opus-mt-en-sv")
@@ -41,5 +41,11 @@ def translate_and_generate(swedish_short_text):
 # print(output)
 # print(list_models())
 
-# output = translate_and_generate("AI har möjligheten att skapa ett nytt samhälle där människor")
+# output = translate_and_generate('''En junimorgon då det är för tidigt
+# att vakna men för sent att somna om.
+
+# Jag måste ut i grönskan som är fullsatt
+# av minnen, och de följer mig med blicken.
+
+# ''', 150)
 # print(output)
