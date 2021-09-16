@@ -1,5 +1,5 @@
 from transformers import pipeline
-from translate import translate_between_languages
+from tmh.text.translate import translate_between_languages
 
 models = {
     'gpt-j': 'EleutherAI/gpt-neo-2.7B',
