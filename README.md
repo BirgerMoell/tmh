@@ -140,11 +140,20 @@ print(output)
 #### Example GPT-j
 
 ```python
-from from tmh.text.text_generation import generate_text import generate_text
+from from tmh.text.text_generation import generate_text
 
 output = generate_text(model='EleutherAI/gpt-neo-2.7B', prompt="EleutherAI has", min_length=150)
 print(output)
 ```
+
+### Exampel translate and generate
+```python
+from from tmh.text.text_generation import translate_and_generate
+
+output = translate_and_generate("AI har möjligheten att skapa ett nytt samhälle där människor")
+print(output)
+```
+
 
 ### Text Embeddings
 

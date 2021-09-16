@@ -1,4 +1,5 @@
 from transformers import pipeline
+from translate import translate_between_languages
 
 models = {
     'gpt-j': 'EleutherAI/gpt-neo-2.7B',
@@ -20,7 +21,25 @@ def generate_text(model='birgermoell/swedish-gpt', prompt="AI har möjligheten a
 def list_models():
     return models
 
+
+def translate_and_generate(swedish_short_text):
+
+    english_short_text = translate_between_languages(swedish_short_text, "Helsinki-NLP/opus-mt-sv-en")
+    # print("the long english text is", english_long_text)
+
+    english_generation = generate_text(model='EleutherAI/gpt-neo-2.7B', prompt=english_short_text)
+    # print("the english summary is", english_summary)
+
+    swedish_generation = translate_between_languages(english_generation, "Helsinki-NLP/opus-mt-en-sv")
+    # print("the swedish summary is", swedish_summary)
+    return swedish_generation
+
+# generate text with translation
+
 # output = generate_text(model='birgermoell/swedish-gpt', prompt="AI har möjligheten att", min_length=250)
 # output = generate_text(model='EleutherAI/gpt-neo-2.7B', prompt="EleutherAI has", min_length=150)
 # print(output)
 # print(list_models())
+
+# output = translate_and_generate("AI har möjligheten att skapa ett nytt samhälle där människor")
+# print(output)
