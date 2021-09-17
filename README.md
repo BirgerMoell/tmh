@@ -133,7 +133,7 @@ You can use the text generation api to generate text based on any pretrained mod
 ```python
 from tmh.text.text_generation import generate_text
 
-output = generate_text(model='birgermoell/swedish-gpt', prompt="AI har möjligheten att", min_length=150)
+output = generate_text(model='birgermoell/swedish-gpt', prompt="AI har möjligheten att", max_length=250, temperature=0.9)
 print(output)
 ```
 
@@ -142,7 +142,7 @@ print(output)
 ```python
 from from tmh.text.text_generation import generate_text
 
-output = generate_text(model='EleutherAI/gpt-neo-2.7B', prompt="EleutherAI has", min_length=150)
+output = generate_text(model='EleutherAI/gpt-neo-2.7B', prompt="EleutherAI has", max_length=250, temperature=0.9)
 print(output)
 ```
 
@@ -150,8 +150,8 @@ print(output)
 ```python
 from from tmh.text.text_generation import translate_and_generate
 
-output = translate_and_generate("AI har möjligheten att skapa ett nytt samhälle där människor")
-print(output)
+output = translate_and_generate("AI har möjligheten att skapa ett nytt samhälle där människor", max_length=250, temperature=0.9)
+print(output) 
 ```
 
 
