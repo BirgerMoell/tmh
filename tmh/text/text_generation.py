@@ -47,3 +47,6 @@ def translate_and_generate(swedish_short_text, max_length=250, temperature=0.9):
 # print("Swedish", text)
 # text2 = translate_and_generate('Kärlek är', max_length=250, temperature=0.9)
 # print("Translated", text2)
+
+# text = generate_text(prompt="Kärlek är", max_length=250, temperature=0.9)
+# print("Swedish", text)
