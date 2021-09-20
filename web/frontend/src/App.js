@@ -11,7 +11,7 @@ import './App.css';
 
 // text
 
-const base_url = "http://localhost:8000/"
+const base_url = "http://localhost:4000/"
 
 
 function App() {
@@ -29,7 +29,7 @@ function App() {
 
     console.log("the request is", data)
   
-    let url = "http://localhost:8000/generate"
+    let url = "http://localhost:4000/generate"
   
     let response = await fetch(url,
       {
