@@ -5,6 +5,7 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 from starlette.middleware.cors import CORSMiddleware
 from tmh.text.text_generation import generate_text
+import uvicorn
 
 class GenerateRequest(BaseModel):
     text: str
@@ -68,3 +69,6 @@ async def generate_response(generateRequest: GenerateRequest):
     #print("the response is", response)
     return {
         "text": response }
+
+if __name__ == "__main__":
+    uvicorn.run(app, host="0.0.0.0", port=4000)
