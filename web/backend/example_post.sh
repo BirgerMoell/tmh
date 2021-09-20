@@ -1,0 +1,1 @@
+curl -v -d '{"text":"Det var en gång", "model":"birgermoell/swedish-gpt"}' -H "Content-Type: application/json" -X POST http://localhost:8000//generate
