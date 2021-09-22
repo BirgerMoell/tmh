@@ -114,6 +114,15 @@ phonemes = get_phonemes("I'm eating a cake", model_checkpoint='./en_us_cmudict_i
 print(phonemes)
 ```
 
+#### Swedish phonemes
+To use the swedish phonemes you need a swedish model stored at the model checkpoint path.
+
+```python
+from tmh.phonemes import get_phonemes
+phonemes = get_phonemes('Välkommen till tal, musik och hörsel', model_checkpoint='swedish_model.pt')
+print(phonemes)
+```
+
 ### Speech Generation
 #### Tacotron 2
 Make sure you install these packages before running tacotron 2
