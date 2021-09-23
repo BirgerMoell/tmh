@@ -110,7 +110,7 @@ https://public-asai-dl-models.s3.eu-central-1.amazonaws.com/DeepPhonemizer/en_us
 The model assumes that the model is stored at ./en_us_cmudict_ipa_forward.pt (you can change the model checkpoint param to save to another location)
 ```python
 from tmh.phonemes import get_phonemes
-phonemes = get_phonemes("I'm eating a cake", model_checkpoint='./en_us_cmudict_ipa_forward.pt')
+phonemes = get_phonemes("I'm eating a cake", model_checkpoint='./en_us_cmudict_ipa_forward.pt', language="English)
 print(phonemes)
 ```
 
@@ -119,7 +119,7 @@ To use the swedish phonemes you need a swedish model stored at the model checkpo
 
 ```python
 from tmh.phonemes import get_phonemes
-phonemes = get_phonemes('Välkommen till tal, musik och hörsel', model_checkpoint='swedish_model.pt')
+phonemes = get_phonemes('Välkommen till tal, musik och hörsel', model_checkpoint='swedish_model.pt', language="Swedish)
 print(phonemes)
 ```
 

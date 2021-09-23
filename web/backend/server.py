@@ -4,6 +4,7 @@ from typing import Optional
 from fastapi import FastAPI
 from pydantic import BaseModel
 from starlette.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from tmh.text.text_generation import generate_text
 import uvicorn
 
@@ -79,8 +80,9 @@ class QaRequest(BaseModel):
 
 class PhonemeRequest(BaseModel):
     text: str
+    language: str
     model: Optional[str] = None
-
+    
     class Config:
         schema_extra = {
             "example": {
@@ -114,6 +116,7 @@ app.add_middleware(
     allow_headers=["*"]
 )
 
+app.mount("/models", StaticFiles(directory="models"), name="models")
 
 @app.get("/")
 def read_root():
@@ -197,12 +200,18 @@ async def qa_response(summaryRequest: SummaryRequest):
 
 @app.post("/phonemize")
 async def qa_response(phonemeRequest: PhonemeRequest):
-    print("inside phonemize")
+    print("inside phonemize with", phonemeRequest)
     
     from tmh.phonemes import get_phonemes
-    imp
+    # import pdb
+    # pdb.set_trace()
 
-    phonemes = get_phonemes(phonemeRequest.text, 'models/best_model_no_optim.pt')
+    phoneme_models = {
+        "English": "models/en_us_cmudict_ipa_forward.pt",
+        "Swedish": "models/best_model_no_optim.pt"
+    }
+
+    phonemes = get_phonemes(phonemeRequest.text, phoneme_models[phonemeRequest.language], language=phonemeRequest.language)
     
     print(phonemes)
 
