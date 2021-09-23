@@ -76,6 +76,20 @@ class QaRequest(BaseModel):
             }
         }
 
+
+class PhonemeRequest(BaseModel):
+    text: str
+    model: Optional[str] = None
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "text": "Tal, Musik Hörsel är en underbar plats.",
+                "language": "Swedish",
+            }
+        }
+
+
 app = FastAPI()
 
 origins = [
@@ -180,6 +194,19 @@ async def qa_response(summaryRequest: SummaryRequest):
     print(swedish_summary)
 
     return swedish_summary
+
+@app.post("/phonemize")
+async def qa_response(phonemeRequest: PhonemeRequest):
+    print("inside phonemize")
+    
+    from tmh.phonemes import get_phonemes
+    imp
+
+    phonemes = get_phonemes(phonemeRequest.text, 'models/best_model_no_optim.pt')
+    
+    print(phonemes)
+
+    return phonemes
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=4000)

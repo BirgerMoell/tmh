@@ -27,9 +27,5 @@ def get_phonemes(text, model_checkpoint='./en_us_cmudict_ipa_forward.pt', langua
     if language == 'Swedish':
         return get_swedish_phonemes(text, model_checkpoint)
 
-
-
-
-
-banan = get_phonemes('Välkommen till tal, musik och hörsel','best_model.pt')
-print(banan)
+# banan = get_phonemes('Välkommen till tal, musik och hörsel','best_model.pt')
+# print(banan)
