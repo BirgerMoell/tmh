@@ -17,7 +17,16 @@ def get_swedish_phonemes(text, model_path):
     pred = predictor.Predictor(transformer, preprocessor)
     phoneme_dict = checkpoint['phoneme_dict']
     phonemize = Phonemizer(pred, phoneme_dict)
-    return phonemize.phonemise_list([text], 'se').phonemes 
+    phonemes = phonemize(text, 'se')
+    result = ''
+    for i, ph in enumerate(phonemes):
+        if ph == ' ':
+            result = result + '_ '
+        if ph not in '23:_ ':
+            result = result + ph + ' '
+        elif ph != ' ':
+            result = result[:-1] + ph + ' ' 
+    return result
 
 def get_phonemes(text, model_checkpoint='./en_us_cmudict_ipa_forward.pt', language='English'):    
     if language == 'English':
@@ -27,5 +36,9 @@ def get_phonemes(text, model_checkpoint='./en_us_cmudict_ipa_forward.pt', langua
     if language == 'Swedish':
         return get_swedish_phonemes(text, model_checkpoint)
 
-# phonemes = get_phonemes('Välkommen till tal, musik och hörsel','../web/backend/models/best_model_no_optim.pt', language="Swedish")
-# print(phonemes)
+
+
+
+
+banan = get_phonemes('Välkommen till tal, musik och hörsel','best_model.pt', 'Swedish')
+print(banan)
