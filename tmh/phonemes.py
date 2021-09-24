@@ -7,9 +7,12 @@ import torch
 ## https://public-asai-dl-models.s3.eu-central-1.amazonaws.com/DeepPhonemizer/en_us_cmudict_ipa_forward.pt
 ## The model assumes that the model is stored in the current folder.
 
-def get_swedish_phonemes(text, model_path):
+def get_swedish_phonemes(text, model_path, stress_marks=False):
     checkpoint = model_path
-    transformer = model.ForwardTransformer(55, 52, d_fft=1024, d_model=512, dropout=0.1, heads=4, layers=6)
+    if stress_marks:
+        transformer = model.ForwardTransformer(55, 55, d_fft=1024, d_model=512, dropout=0.1, heads=4, layers=6)
+    else:
+        transformer = model.ForwardTransformer(55, 52, d_fft=1024, d_model=512, dropout=0.1, heads=4, layers=6)
     device = torch.device('cpu')
     checkpoint = torch.load(checkpoint, map_location=device)
     transformer.load_state_dict(checkpoint['model'])
@@ -28,17 +31,12 @@ def get_swedish_phonemes(text, model_path):
             result = result[:-1] + ph + ' ' 
     return result
 
-def get_phonemes(text, model_checkpoint='./en_us_cmudict_ipa_forward.pt', language='English'):    
+def get_phonemes(text, model_checkpoint='./en_us_cmudict_ipa_forward.pt', language='English', stress_marks=False):    
     if language == 'English':
         phonemizer = Phonemizer.from_checkpoint(model_checkpoint)
         phonemes = phonemizer(text, lang='en_us')
         return phonemes
-    if language == 'Swedish':
+    if language == 'Swedish' and stress_marks:
+        return get_swedish_phonemes(text, model_checkpoint, stress_marks=True)
+    else:
         return get_swedish_phonemes(text, model_checkpoint)
-
-
-
-
-
-banan = get_phonemes('Välkommen till tal, musik och hörsel','best_model.pt', 'Swedish')
-print(banan)
