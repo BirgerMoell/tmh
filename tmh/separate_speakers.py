@@ -22,6 +22,9 @@ from speechbrain.pretrained import EncoderClassifier
 
 pipeline = VoiceActivityDetection(segmentation="pyannote/segmentation")
 
+# speaker embedding
+inference = Inference("pyannote/embedding", window="whole")
+
 HYPER_PARAMETERS = {
   # onset/offset activation thresholds
   "onset": 0.5, "offset": 0.5,
@@ -47,16 +50,15 @@ def classify_speakers_based_on_embeddings(X):
     return y
 
 
-def extract_speaker_embedding(signal):
-    import pdb
-    pdb.set_trace()
-    classifier = EncoderClassifier.from_hparams(source="speechbrain/spkrec-xvect-voxceleb", savedir="pretrained_models/spkrec-xvect-voxceleb")
-    embeddings = classifier.encode_batch(signal)
+def extract_speaker_embedding(signal, audio):
+
+    audio_file = torch.tensor(audio[signal.start*1000 : signal.end * 1000].get_array_of_samples())
+    #embeddings = classifier.encode_batch(audio_file)
+    embeddings = inference( {"waveform": audio_file.unsqueeze(0).float(), "sample_rate": 44100} )
+
     # print(embeddings)
     return embeddings
     
-    
-
 
 
 def create_speaker_files_from_audio_path(audio_path):
@@ -121,7 +123,7 @@ def create_speaker_files_from_audio_path(audio_path):
         current_segment = Segment(start_time, end_time)
         print('Long segment: ', current_segment)
         #embedding = inference.crop("temp.wav", current_segment)
-        embedding = extract_speaker_embedding(current_segment)
+        embedding = extract_speaker_embedding(current_segment, audio)
         
         
         timeline.add(current_segment)
@@ -178,6 +180,6 @@ def time_format( t ) :
     return str(hours) + ":" + str(minutes) + ":" + str(seconds) + "." + str(fraction)
 
 
-file_path = "/Volumes/EACARE_B1/pat020-2020-02-03/microphone.wav"
+file_path = "/home/bmoell/tmh/test_audio.wav"
 output = create_speaker_files_from_audio_path(file_path)
 print(output)

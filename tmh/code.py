@@ -1,8 +1,6 @@
 import os
 import openai
 
-
-
 def generate(prompt):
     response = openai.Completion.create(
     engine="davinci-codex",
