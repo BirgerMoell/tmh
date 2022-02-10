@@ -27,9 +27,9 @@ def write_to_file(text, file):
     info.write(text)
     info.close()
 
-response = generate_from_prompt('''
-Make me a sandwich.
-'''
-)
+# response = generate_from_prompt('''
+# Make me a sandwich.
+# '''
+# )
 
-write_to_file(response, "generated.py")
+# write_to_file(response, "generated.py")

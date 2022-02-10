@@ -12,6 +12,20 @@ pip install tmh
 pip install https://github.com/pyannote/pyannote-audio/archive/develop.zip
 ```
 
+### Working with language model transcripions
+If you want to work with language model transcripts you also need further installs. These are not required in the package in order not to bloat the install for users without interest in LM transcription models.
+
+```
+pip install pyctcdecode
+pip install https://github.com/kpu/kenlm/archive/master.zip
+```
+
+```
+sudo apt install build-essential cmake libboost-system-dev libboost-thread-dev libboost-program-options-dev libboost-test-dev libeigen3-dev zlib1g-dev libbz2-dev liblzma-dev
+```
+
+You also need system installs to work with kenlm
+
 ## Example usage
 
 ### Transcription

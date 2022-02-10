@@ -3,7 +3,8 @@ from xdrlib import ConversionError
 import torchaudio
 import torch
 from itertools import groupby
-from transformers import Wav2Vec2Processor, Wav2Vec2ForCTC
+from transformers import Wav2Vec2Processor, Wav2Vec2ForCTC, Wav2Vec2ProcessorWithLM
+from transformers import AutoModel, AutoModelForCTC
 from transformers import HubertForSequenceClassification, Wav2Vec2FeatureExtractor
 from transformers import pipeline
 import librosa
@@ -94,7 +95,7 @@ def convert_to_wav(audio_path):
     sf.write(wav_path, audio, sr, subtype='PCM_24')
     return wav_path
 
-def transcribe_from_audio_path(audio_path, language='Swedish', check_language=False, classify_emotion=False, model=""):
+def transcribe_from_audio_path(audio_path, language='Swedish', check_language=False, classify_emotion=False, model="", lm=False):
     converted = False
     if audio_path[-4:] != ".wav":
         try:
@@ -128,18 +129,31 @@ def transcribe_from_audio_path(audio_path, language='Swedish', check_language=Fa
             model_id = "KBLab/wav2vec2-large-voxrex-swedish"
 
     if model:
+        print("choosing model")
         model_id = model
 
-    processor = Wav2Vec2Processor.from_pretrained(model_id)
-    model = Wav2Vec2ForCTC.from_pretrained(model_id)
-    with torch.no_grad():
-        #logits = model(chunk.to("cuda")).logits
-        logits = model(waveform).logits
-    pred_ids = torch.argmax(logits, dim=-1)
-    transcription = processor.batch_decode(pred_ids)
-    #get_word_timestamps(transcription[0], pred_ids, chunk, sample_length)
-    #print(transcription)
-    return transcription[0]
+    print("the model is", model_id)
+
+    # check model type
+    if lm:
+        processor = Wav2Vec2ProcessorWithLM.from_pretrained(model_id)
+        model = Wav2Vec2ProcessorWithLM.from_pretrained(model_id)
+        with torch.no_grad():
+            logits = model(waveform).logits
+            transcription = processor.batch_decode(logits.numpy()).text
+            print(transcription)
+            return transcription[0]
+    else:
+        processor = AutoModel.from_pretrained(model_id)
+        model = Wav2Vec2ForCTC.from_pretrained(model_id)
+        with torch.no_grad():
+            #logits = model(chunk.to("cuda")).logits
+            logits = model(waveform).logits
+        pred_ids = torch.argmax(logits, dim=-1)
+        transcription = processor.batch_decode(pred_ids)
+        #get_word_timestamps(transcription[0], pred_ids, chunk, sample_length)
+        #print(transcription)
+        return transcription[0]
 
 
 def get_word_timestamps(transcription: str, predicted_ids, input_values, sample_rate) -> Any:
@@ -164,3 +178,8 @@ def get_word_timestamps(transcription: str, predicted_ids, input_values, sample_
 # print("the output is", output)
 # transcription = "Det visste i varje fall näsan."
 # print("the transcription is", transcription)
+
+if __name__ == "__main__":
+    file_path = "/Users/bmoell/Code/test_tanscribe/sv.wav"
+    output = transcribe_from_audio_path(file_path, model="birgermoell/lm-swedish", lm=True)
+    print(output)
