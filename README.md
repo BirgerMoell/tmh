@@ -45,6 +45,15 @@ overlap = overlap_detection(audio_path)
 print(overlap)
 ```
 
+### Speaker Diarization
+Speaker Diarization seperates an audio file into two different speakers
+
+```python
+file_path = "/home/bmoell/tmh/tmh/test.wav"
+output = create_speaker_files_with_dl(file_path)
+print(output)
+```
+
 ### Language classification
 ``` python
 from tmh.transcribe import classify_language

@@ -8,6 +8,7 @@ import argparse
 ## https://public-asai-dl-models.s3.eu-central-1.amazonaws.com/DeepPhonemizer/en_us_cmudict_ipa_forward.pt
 ## The model assumes that the model is stored in the current folder.
 
+
 parser = argparse.ArgumentParser(description='Phonemize Swedish or English text')
 parser.add_argument("--model_path", metavar='M', type=str, nargs='?', default='./en_us_cmudict_ipa_forward.pt',
                     help='The model path to your saved checkpoint')
@@ -75,3 +76,4 @@ if __name__=='__main__':
 
     else:
         print(get_phonemes(text, model_path, language, stress))
+
