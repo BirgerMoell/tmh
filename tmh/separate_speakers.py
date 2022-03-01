@@ -78,9 +78,11 @@ def create_speaker_files_from_audio_path(audio_path):
     for turn, _, speaker in diarization.itertracks(yield_label=True):
         print(f"start={turn.start:.1f}s stop={turn.end:.1f}s speaker_{speaker}")
         current_audio_segment = audio[turn.start*1000:turn.end*1000]
-        if speaker == "SPEAKER_OO":
+        if speaker == "SPEAKER_00":
+            print("speaker1", speaker)
             speaker1+=current_audio_segment
-        else:
+        elif speaker == "SPEAKER_01":
+            print("speaker2", speaker2)
             speaker2+=current_audio_segment
 
         speaker1.export("speaker1.wav", format="wav")
@@ -207,6 +209,6 @@ def time_format( t ) :
     return str(hours) + ":" + str(minutes) + ":" + str(seconds) + "." + str(fraction)
 
 
-# file_path = "/home/bmoell/tmh/tmh/test.wav"
-# output = create_speaker_files_from_audio_path(file_path)
-# print(output)
+file_path = "/home/bmoell/tmh/macka98_16khz.wav"
+output = create_speaker_files_from_audio_path(file_path)
+print(output)
