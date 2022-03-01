@@ -61,7 +61,7 @@ def extract_speaker_embedding(signal, audio):
     
 
 
-def create_speaker_files_with_dl(audio_path):
+def create_speaker_files_from_audio_path(audio_path):
 
     from pyannote.audio import Pipeline
     pipeline = Pipeline.from_pretrained("pyannote/speaker-diarization")
@@ -88,7 +88,7 @@ def create_speaker_files_with_dl(audio_path):
 
 
 
-def create_speaker_files_from_audio_path(audio_path):
+def create_speaker_files_from_audio_path_old(audio_path):
     """
     Creates speaker files from the audio file at audio_path by splitting based on speaker.
 
@@ -207,6 +207,6 @@ def time_format( t ) :
     return str(hours) + ":" + str(minutes) + ":" + str(seconds) + "." + str(fraction)
 
 
-file_path = "/home/bmoell/tmh/tmh/test.wav"
-output = create_speaker_files_with_dl(file_path)
-print(output)
+# file_path = "/home/bmoell/tmh/tmh/test.wav"
+# output = create_speaker_files_from_audio_path(file_path)
+# print(output)
