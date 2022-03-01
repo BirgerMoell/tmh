@@ -1,3 +1,5 @@
+from lib2to3.pytree import convert
+from xdrlib import ConversionError
 import torchaudio
 import torch
 from itertools import groupby
@@ -8,8 +10,13 @@ import librosa
 
 from speechbrain.pretrained import EncoderClassifier
 from typing import Any
+import soundfile as sf
+import os
 
 # from language_files import get_model
+
+class ConversionError(Exception):
+    pass
 
 language_dict = {
     "Swedish": "KBLab/wav2vec2-large-voxrex-swedish",
@@ -79,12 +86,32 @@ def classify_language(audio_path):
     out_prob, score, index, text_lab = classifier.classify_file(audio_path)
     return(text_lab[0])
 
+def convert_to_wav(audio_path):
+    path = audio_path.split("/")
+    filename = path[-1].split(".")[0]
+    audio, sr = librosa.load(audio_path)
+    wav_path = f'{filename}.wav'
+    sf.write(wav_path, audio, sr, subtype='PCM_24')
+    return wav_path
+
 def transcribe_from_audio_path(audio_path, language='Swedish', check_language=False, classify_emotion=False, model=""):
+    converted = False
+    if audio_path[-4:] != ".wav":
+        try:
+            audio_path = convert_to_wav(audio_path)
+            converted = True
+        except:
+            raise ConversionError(f"Could not convert {audio_path} to wav")
+    
     waveform, sample_rate = torchaudio.load(audio_path)
     if sample_rate != 16000:
         #resample to 16000 Hz
         waveform = change_sample_rate(audio_path)
         sample_rate = 16000
+
+    if converted:
+        os.remove(audio_path)
+
     if check_language:
         language = classify_language(audio_path)
         # print("the language is", language)
