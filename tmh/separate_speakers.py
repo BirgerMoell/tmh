@@ -175,8 +175,8 @@ def create_speaker_files_from_audio_path_old(audio_path):
             speaker2 += current_audio_segment
 
     
-    speaker1.export("speaker1.wav", format="wav")
-    speaker2.export("speaker2.wav", format="wav")
+    speaker1.export("speaker1_old.wav", format="wav")
+    speaker2.export("speaker2_old.wav", format="wav")
     
             
 
@@ -209,6 +209,6 @@ def time_format( t ) :
     return str(hours) + ":" + str(minutes) + ":" + str(seconds) + "." + str(fraction)
 
 
-file_path = "/home/bmoell/tmh/macka98_16khz.wav"
-output = create_speaker_files_from_audio_path(file_path)
-print(output)
+# file_path = "/home/bmoell/tmh/macka98_16khz.wav"
+# output = create_speaker_files_from_audio_path(file_path)
+# print(output)
