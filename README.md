@@ -49,7 +49,7 @@ print(overlap)
 Speaker Diarization seperates an audio file into two different speakers
 
 ```python
-from tmh.seperate_speakers import create_speaker_files_from_audio_path
+from tmh.separate_speakers import create_speaker_files_from_audio_path
 file_path = "/home/bmoell/tmh/tmh/test.wav"
 create_speaker_files_from_audio_path(file_path)
 ```
