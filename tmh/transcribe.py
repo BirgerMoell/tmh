@@ -94,7 +94,19 @@ def convert_to_wav(audio_path):
     sf.write(wav_path, audio, sr, subtype='PCM_24')
     return wav_path
 
-def transcribe_from_audio_path(audio_path, language='Swedish', check_language=False, classify_emotion=False, model=""):
+def get_speech_rate_time_stamps(time_stamps, downsample=320, sample_rate=16000):
+
+    utterances = len(time_stamps[0])
+    start_time = time_stamps[0][0]['start_offset']
+    end_time = time_stamps[0][utterances-1]['end_offset']
+    duration = end_time - start_time
+    
+    speech_rate = ((duration / utterances) * downsample) / sample_rate
+    
+    return speech_rate
+
+
+def transcribe_from_audio_path(audio_path, language='Swedish', check_language=False, classify_emotion=False, model="", output_word_offsets=False):
     converted = False
     if audio_path[-4:] != ".wav":
         try:
@@ -133,31 +145,21 @@ def transcribe_from_audio_path(audio_path, language='Swedish', check_language=Fa
     processor = Wav2Vec2Processor.from_pretrained(model_id)
     model = Wav2Vec2ForCTC.from_pretrained(model_id)
     with torch.no_grad():
-        #logits = model(chunk.to("cuda")).logits
         logits = model(waveform).logits
     pred_ids = torch.argmax(logits, dim=-1)
-    transcription = processor.batch_decode(pred_ids)
-    #get_word_timestamps(transcription[0], pred_ids, chunk, sample_length)
-    #print(transcription)
-    return transcription[0]
+
+    if output_word_offsets:
+        outputs = processor.batch_decode(pred_ids, output_word_offsets=output_word_offsets)
+        transcription = outputs["text"][0]
+        token_time_stamps = outputs[1]
+        speech_rate = get_speech_rate_time_stamps(token_time_stamps)
+        word_time_stamps = outputs[2]
+        return transcription, speech_rate
+    else:
+        transcription = processor.batch_decode(pred_ids)
+        return transcription[0]
 
 
-def get_word_timestamps(transcription: str, predicted_ids, input_values, sample_rate) -> Any:
-        ##############
-    # this is where the logic starts to get the start and end timestamp for each word
-    ##############
-    words = [w for w in transcription.split(' ') if len(w) > 0]
-    predicted_ids = predicted_ids[0].tolist()
-    duration_sec = input_values.shape[1] / sample_rate
-    ids_w_time = [(i / len(predicted_ids) * duration_sec, _id) for i, _id in enumerate(predicted_ids)]
-    ids_w_time = [i for i in ids_w_time if i[1] != processor.tokenizer.pad_token_id]
-    split_ids_w_time = [list(group) for k, group
-                        in groupby(ids_w_time, lambda x: x[1] == processor.tokenizer.word_delimiter_token_id)
-                        if not k]
-    # make sure that there are the same number of id-groups as words. Otherwise something is wrong
-    assert len(split_ids_w_time) == len(words), (len(split_ids_w_time), len(words))
-    print(transcription)
-    print(split_ids_w_time)
 
 # file_path = "/Users/bmoell/Code/test_tanscribe/sv.wav"
 # output = transcribe_from_audio_path(file_path, "English")

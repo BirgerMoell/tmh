@@ -1,14 +1,14 @@
 # from vad import extract_speak_segments
 from librosa.core.spectrum import power_to_db
 import torch
-from .overlap import overlap_detection
-from .transcribe import extract_speaker_embedding
+from overlap import overlap_detection
+from transcribe import extract_speaker_embedding
 import numpy as np
 
 from sklearn.preprocessing import StandardScaler
 
 from pydub import AudioSegment
-from .audio_embeddings import get_audio_embeddings
+from audio_embeddings import get_audio_embeddings
 
 from pyannote.audio import Inference
 from pyannote.audio.pipelines import VoiceActivityDetection
@@ -88,6 +88,26 @@ def create_speaker_files_from_audio_path(audio_path):
         speaker1.export("speaker1.wav", format="wav")
         speaker2.export("speaker2.wav", format="wav")
 
+
+def wavlm_speaker_diarization(audio_path):
+    from transformers import Wav2Vec2FeatureExtractor, UniSpeechSatForAudioFrameClassification
+    import torch
+
+    audio_file = torchaudio.load(audio_path)
+
+    feature_extractor = Wav2Vec2FeatureExtractor.from_pretrained('microsoft/wavlm-base-sd')
+    model = UniSpeechSatForAudioFrameClassification.from_pretrained('microsoft/wavlm-base-sd')
+
+
+
+    # audio file is decoded on the fly
+    inputs = feature_extractor(audio_file, return_tensors="pt")
+    logits = model(**inputs).logits
+    probabilities = torch.sigmoid(logits[0])
+
+    # labels is a one-hot array of shape (num_frames, num_speakers)
+    labels = (probabilities > 0.5).long()
+    print(labels)
 
 
 def create_speaker_files_from_audio_path_old(audio_path):
@@ -209,6 +229,5 @@ def time_format( t ) :
     return str(hours) + ":" + str(minutes) + ":" + str(seconds) + "." + str(fraction)
 
 
-# file_path = "/home/bmoell/tmh/macka98_16khz.wav"
-# output = create_speaker_files_from_audio_path(file_path)
-# print(output)
+file_path = "/home/bmoell/tmh/tmh/test.wav"
+wavlm_speaker_diarization(file_path)
