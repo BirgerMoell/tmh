@@ -26,6 +26,27 @@ print(asr_transcription)
 print("the transcription is", transcription)
 ```
 
+### Transcription
+``` python
+from tmh.transcribe import transcribe_from_audio_path
+file_path = "./sv.wav"
+transcription = "Nu prövar vi att spela in ljud på svenska sex laxar i en laxask de finns en stor banan"
+print("creating transcription")
+asr_transcription = transcribe_from_audio_path(file_path)
+print("output")
+print(asr_transcription)
+print("the transcription is", transcription)
+```
+
+### Transcription with speech rate
+``` python
+from tmh.transcribe import transcribe_from_audio_path
+file_path = "/home/bmoell/tmh/tmh/test.wav"
+output = transcribe_from_audio_path(file_path, "English", output_word_offsets=True)
+print("the output is", output)
+the output is {'transcription': "hello hello hello i'm talking the end bye", 'speech_rate': 0.1142857142857143, 'averages': {'h': 0.02499999999999991, 'e': 0.019999999999999945, 'l': 0.020000000000000018, 'o': 0.020000000000000018, ' ': 0.040000000000000036, 'i': 0.030000000000000027, "'": 0.020000000000000018, 'm': 0.020000000000000018, 't': 0.020000000000000018, 'a': 0.020000000000000018, 'k': 0.020000000000000018, 'n': 0.02000000000000024, 'g': 0.020000000000000018, 'd': 0.020000000000000462, 'b': 0.020000000000000462, 'y': 0.020000000000000462}, 'standard_deviations': {'h': 0.008660254037844203, 'e': 3.0517331120737817e-16, 'l': 0.0, 'o': 0.0, ' ': 0.017320508075688693, 'i': 0.010000000000000009, "'": 0.0, 'm': 0.0, 't': 0.0, 'a': 0.0, 'k': 0.0, 'n': 2.220446049250313e-16, 'g': 0.0, 'd': 0.0, 'b': 0.0, 'y': 0.0}, 'variances': {'h': 7.499999999999681e-05, 'e': 9.313074987327527e-32, 'l': 0.0, 'o': 0.0, ' ': 0.00029999999999999715, 'i': 0.00010000000000000018, "'": 0.0, 'm': 0.0, 't': 0.0, 'a': 0.0, 'k': 0.0, 'n': 4.930380657631324e-32, 'g': 0.0, 'd': 0.0, 'b': 0.0, 'y': 0.0}}
+``` 
+
 ### Transcribe with VAD
 ``` python
 from tmh.transcribe_with_vad import transcribe_from_audio_path_split_on_speech

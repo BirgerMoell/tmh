@@ -12,6 +12,7 @@ from speechbrain.pretrained import EncoderClassifier
 from typing import Any
 import soundfile as sf
 import os
+import numpy as np
 
 # from language_files import get_model
 
@@ -105,6 +106,47 @@ def get_speech_rate_time_stamps(time_stamps, downsample=320, sample_rate=16000):
     
     return speech_rate
 
+def calculate_variance(data):
+    n = len(data)
+    mean = sum(data) / n
+    # Square deviations
+    deviations = [(x - mean) ** 2 for x in data]
+    # Variance
+    variance = sum(deviations) / n
+    return variance
+
+def get_speech_rate_variability(time_stamps, type='char', downsample=320, sample_rate=16000 ):
+    base = downsample / sample_rate
+    token_durations = {}
+
+    for time_stamp in time_stamps[0]:
+
+        start_time = round(time_stamp['start_offset']*base, 2)
+        end_time = round(time_stamp['end_offset']*base, 2)
+        char = time_stamp[type]
+        duration = end_time - start_time
+
+        if char not in token_durations:
+            token_durations[char] = []
+
+        token_durations[char].append(duration)
+
+    averages = dict()
+    stds = dict()
+    variances = dict()
+
+    for token, durations in token_durations.items():
+        average = np.sum(durations) / len(durations)
+        std = np.std(durations)
+        # print("the tokens are", token)
+        # print("the durations are", durations)
+        # print("the average is", average)
+        variance = calculate_variance(durations)
+        averages[token] = average
+        stds[token] = std
+        variances[token] = variance
+    
+    return averages, stds, variances
 
 def transcribe_from_audio_path(audio_path, language='Swedish', check_language=False, classify_emotion=False, model="", output_word_offsets=False):
     converted = False
@@ -153,16 +195,23 @@ def transcribe_from_audio_path(audio_path, language='Swedish', check_language=Fa
         transcription = outputs["text"][0]
         token_time_stamps = outputs[1]
         speech_rate = get_speech_rate_time_stamps(token_time_stamps)
+        averages, stds, variances = get_speech_rate_variability(token_time_stamps, type="char")
         word_time_stamps = outputs[2]
-        return transcription, speech_rate
+        return {
+            "transcription": transcription,
+            "speech_rate": speech_rate,
+            "averages": averages,
+            "standard_deviations": stds,
+            "variances": variances
+        }
     else:
         transcription = processor.batch_decode(pred_ids)
         return transcription[0]
 
 
 
-# file_path = "/Users/bmoell/Code/test_tanscribe/sv.wav"
-# output = transcribe_from_audio_path(file_path, "English")
-# print("the output is", output)
+file_path = "/home/bmoell/tmh/tmh/test.wav"
+output = transcribe_from_audio_path(file_path, "English", output_word_offsets=True)
+print("the output is", output)
 # transcription = "Det visste i varje fall näsan."
 # print("the transcription is", transcription)
