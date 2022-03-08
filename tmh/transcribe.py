@@ -210,8 +210,8 @@ def transcribe_from_audio_path(audio_path, language='Swedish', check_language=Fa
 
 
 
-file_path = "/home/bmoell/tmh/tmh/test.wav"
-output = transcribe_from_audio_path(file_path, "English", output_word_offsets=True)
-print("the output is", output)
+# file_path = "/home/bmoell/tmh/tmh/test.wav"
+# output = transcribe_from_audio_path(file_path, "English", output_word_offsets=True)
+# print("the output is", output)
 # transcription = "Det visste i varje fall näsan."
 # print("the transcription is", transcription)
