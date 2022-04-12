@@ -316,6 +316,27 @@ python3 -m build
 twine upload --skip-existing dist/*
 ```
 
+### Setting up development environment
+
+For development we use [Conda](https://docs.conda.io/en/latest/). First create the virtual environment
+
+```
+conda create -n tmh
+```
+
+Activate it
+
+```
+conda activate tmh
+```
+
+Install dependencies
+
+```
+conda install pytorch==1.10.0 torchvision==0.11.1 torchaudio==0.10.0 -c pytorch
+conda env update --file local.yml --prune
+```
+
 ### Read the docs
 https://tmh-docs.readthedocs.io/en/latest/docs.html#getting-started
 
