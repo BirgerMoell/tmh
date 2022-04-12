@@ -334,7 +334,7 @@ Install dependencies
 
 ```
 pip install https://github.com/pyannote/pyannote-audio/archive/develop.zip
-conda install pytorch==1.10.0 torchvision==0.11.1 torchaudio==0.10.0 -c pytorch
+pip install torch==1.10.0+cu113 torchvision==0.11.1+cu113 torchaudio==0.10.0+cu113 cudatoolkit==11.3 -f https://download.pytorch.org/whl/cu113/torch_stable.html
 conda env update --file local.yml --prune
 ```
 
