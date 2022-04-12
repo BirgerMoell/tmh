@@ -333,6 +333,7 @@ conda activate tmh
 Install dependencies
 
 ```
+pip install https://github.com/pyannote/pyannote-audio/archive/develop.zip
 conda install pytorch==1.10.0 torchvision==0.11.1 torchaudio==0.10.0 -c pytorch
 conda env update --file local.yml --prune
 ```
