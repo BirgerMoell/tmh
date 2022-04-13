@@ -1,14 +1,14 @@
 # from vad import extract_speak_segments
 from librosa.core.spectrum import power_to_db
 import torch
-from overlap import overlap_detection
-from transcribe import extract_speaker_embedding
+from .overlap import overlap_detection
+from .transcribe import extract_speaker_embedding
 import numpy as np
 
 from sklearn.preprocessing import StandardScaler
 
 from pydub import AudioSegment
-from audio_embeddings import get_audio_embeddings
+from .audio_embeddings import get_audio_embeddings
 
 from pyannote.audio import Inference
 from pyannote.audio.pipelines import VoiceActivityDetection
@@ -228,6 +228,3 @@ def time_format( t ) :
     fraction = int((t%1)*100)
     return str(hours) + ":" + str(minutes) + ":" + str(seconds) + "." + str(fraction)
 
-
-file_path = "/home/bmoell/tmh/tmh/test.wav"
-wavlm_speaker_diarization(file_path)
