@@ -57,6 +57,18 @@ print("transcription")
 print(asr_transcription_with_vad)
 ```
 
+### Transcription with LM
+In order to transcribe with an additional language model you need to install kenlm
+pip install https://github.com/kpu/kenlm/archive/master.zip
+``` python
+from tmh.transcribe_with_lm import transcribe_from_audio_path_with_lm
+file_path = "./sv.wav"
+transcription = transcribe_from_audio_path_with_lm(file_path, 'viktor-enzell/wav2vec2-large-voxrex-swedish-4gram')
+print("output")
+print(asr_transcription)
+print("the transcription is", transcription)
+```
+
 ### Overlap detection
 ```python
 from tmh.overlap import overlap_detection
@@ -179,7 +191,7 @@ print(output)
 #### Example GPT-j
 
 ```python
-from from tmh.text.text_generation import generate_text
+from tmh.text.text_generation import generate_text
 
 output = generate_text(model='EleutherAI/gpt-neo-2.7B', prompt="EleutherAI has", max_length=250, temperature=0.9)
 print(output)
@@ -187,7 +199,7 @@ print(output)
 
 ### Exampel translate and generate
 ```python
-from from tmh.text.text_generation import translate_and_generate
+from tmh.text.text_generation import translate_and_generate
 
 output = translate_and_generate("AI har möjligheten att skapa ett nytt samhälle där människor", max_length=250, temperature=0.9)
 print(output) 

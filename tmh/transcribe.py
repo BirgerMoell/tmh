@@ -148,7 +148,7 @@ def get_speech_rate_variability(time_stamps, type='char', downsample=320, sample
     
     return averages, stds, variances
 
-def transcribe_from_audio_path(audio_path, language='Swedish', check_language=False, classify_emotion=False, model="", output_word_offsets=False):
+def transcribe_from_audio_path(audio_path, language='Swedish', check_language=False, classify_emotion=False, model="", output_word_offsets=False, language_model=False):
     converted = False
     if audio_path[-4:] != ".wav":
         try:
@@ -208,6 +208,21 @@ def transcribe_from_audio_path(audio_path, language='Swedish', check_language=Fa
         transcription = processor.batch_decode(pred_ids)
         return transcription[0]
 
+
+def output_word_offset(pred_ids, processor, output_word_offsets):
+    outputs = processor.batch_decode(pred_ids, output_word_offsets=output_word_offsets)
+    transcription = outputs["text"][0]
+    token_time_stamps = outputs[1]
+    speech_rate = get_speech_rate_time_stamps(token_time_stamps)
+    averages, stds, variances = get_speech_rate_variability(token_time_stamps, type="char")
+    word_time_stamps = outputs[2]
+    return {
+        "transcription": transcription,
+        "speech_rate": speech_rate,
+        "averages": averages,
+        "standard_deviations": stds,
+        "variances": variances
+    }
 
 
 # file_path = "/home/bmoell/tmh/tmh/test.wav"
