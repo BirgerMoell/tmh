@@ -57,7 +57,8 @@ def transcribe_from_audio_path_with_lm(audio_path, model_id="viktor-enzell/wav2v
         logits = model(**inputs).logits
     
     transcripts = processor.batch_decode(logits.cpu().numpy()).text
-    return transcripts
+    #print(transcripts)
+    return transcripts[0]
 
 
 
@@ -100,16 +101,8 @@ def transcribe_from_audio_path_with_lm_vad(audio_path, model_id="viktor-enzell/w
             "start": segment['segment']['start'],
             "end": segment['segment']['end']
         }
-        print(transcription)
+        #print(transcription)
         transcriptions.append(full_transcript)
 
     return transcriptions
 
-#file_path = "/Users/bmoell/Code/tmh-package/tmh/speaker2.wav"
-# output = transcribe_from_audio_path(file_path, "English", output_word_offsets=True)
-# print("the output is", output)
-# transcription = "Det visste i varje fall näsan."
-# print("the transcription is", transcription)
-
-# transcripts = transcribe_from_audio_path_with_lm_vad(file_path, 'viktor-enzell/wav2vec2-large-voxrex-swedish-4gram')
-# print(transcripts)

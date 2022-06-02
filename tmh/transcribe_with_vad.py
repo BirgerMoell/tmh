@@ -156,8 +156,3 @@ def time_format( t ) :
     seconds = int(t-hours*3600-minutes*60)
     fraction = int((t%1)*100)
     return str(hours) + ":" + str(minutes) + ":" + str(seconds) + "." + str(fraction)
-
-
-# file_path = "./test.wav"
-# output = transcribe_from_audio_path_split_on_speech(file_path, "English")
-# print(output)
