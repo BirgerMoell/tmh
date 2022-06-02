@@ -51,8 +51,10 @@ def transcribe_from_audio_path_with_lm(audio_path, model_id="viktor-enzell/wav2v
     model = Wav2Vec2ForCTC.from_pretrained(model_id).to(device)
     processor = Wav2Vec2ProcessorWithLM.from_pretrained(model_id)
 
+    inputs = processor(waveform[0], sampling_rate=16000, return_tensors='pt', padding=True).to(device)
+
     with torch.no_grad():
-        logits = model(waveform).logits
+        logits = model(**inputs).logits
     
     transcripts = processor.batch_decode(logits.cpu().numpy()).text
     return transcripts
@@ -86,8 +88,12 @@ def transcribe_from_audio_path_with_lm_vad(audio_path, model_id="viktor-enzell/w
 
     for segment in segments['content']:
         x = waveform[:,int(segment['segment']['start']*sample_rate): int(segment['segment']['end']*sample_rate)]
+
+        inputs = processor(x[0], sampling_rate=16000, return_tensors='pt', padding=True).to(device)
+
         with torch.no_grad():
-            logits = model(x).logits
+            logits = model(**inputs).logits
+
         transcription = processor.batch_decode(logits.cpu().numpy()).text
         full_transcript = {   
             "transcription": transcription[0].encode('utf8').decode(),
