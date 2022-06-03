@@ -11,7 +11,7 @@ from typing import Any
 import soundfile as sf
 import os
 import numpy as np
-from .transcribe_with_vad import extract_speak_segments
+from tmh.transcribe_with_vad import extract_speak_segments
 
 # from language_files import get_model
 def change_sample_rate(audio_path, new_sample_rate=16000):
