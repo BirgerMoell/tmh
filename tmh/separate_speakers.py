@@ -11,7 +11,7 @@ from pydub import AudioSegment
 from .audio_embeddings import get_audio_embeddings
 
 from pyannote.audio import Inference
-from pyannote.audio.pipelines import VoiceActivityDetection
+from pyannote.audio.pipelines import VoiceActivityDetection # pip install https://github.com/pyannote/pyannote-audio/archive/develop.zip
 from transformers import Wav2Vec2Processor, Wav2Vec2Model
 from sklearn.mixture import GaussianMixture
 from sklearn.cluster import KMeans, AgglomerativeClustering, SpectralClustering, MiniBatchKMeans
