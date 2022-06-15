@@ -1,32 +1,19 @@
-from lib2to3.pytree import convert
-import torchaudio
 import torch
-from itertools import groupby
 from transformers import Wav2Vec2ForCTC, Wav2Vec2ProcessorWithLM
-import librosa
-
-from speechbrain.pretrained import EncoderClassifier
-from typing import Any
-import soundfile as sf
 import os
-import numpy as np
 from tmh.transcribe_with_vad import extract_speak_segments
-from utils import change_sample_rate, ensure_wav
+from tmh.utils import load_audio, ensure_wav
 
 # from language_files import get_model
 
 def transcribe_from_audio_path_with_lm(audio_path, model_id="viktor-enzell/wav2vec2-large-voxrex-swedish-4gram"):
     audio_path, converted = ensure_wav(audio_path)
     
-    waveform, sample_rate = torchaudio.load(audio_path)
-    if sample_rate != 16000:
-        #resample to 16000 Hz
-        waveform = change_sample_rate(audio_path)
-        sample_rate = 16000
+    sample_rate = 16000
+    waveform = load_audio(audio_path, sample_rate)
 
     if converted:
         os.remove(audio_path)
-
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     model = Wav2Vec2ForCTC.from_pretrained(model_id).to(device)
@@ -46,14 +33,8 @@ def transcribe_from_audio_path_with_lm(audio_path, model_id="viktor-enzell/wav2v
 def transcribe_from_audio_path_with_lm_vad(audio_path, model_id="viktor-enzell/wav2vec2-large-voxrex-swedish-4gram"):
     audio_path, converted = ensure_wav(audio_path)
     
-    waveform, sample_rate = torchaudio.load(audio_path)
-    if sample_rate != 16000:
-        #resample to 16000 Hz
-        waveform = change_sample_rate(audio_path)
-        sample_rate = 16000
-
-    if converted:
-        os.remove(audio_path)
+    sample_rate = 16000
+    waveform = load_audio(audio_path, sample_rate)
 
     segments = extract_speak_segments(audio_path)
     transcriptions = []
@@ -65,7 +46,7 @@ def transcribe_from_audio_path_with_lm_vad(audio_path, model_id="viktor-enzell/w
     for segment in segments['content']:
         x = waveform[:,int(segment['segment']['start']*sample_rate): int(segment['segment']['end']*sample_rate)]
 
-        inputs = processor(x[0], sampling_rate=16000, return_tensors='pt', padding=True).to(device)
+        inputs = processor(x[0], sampling_rate=sample_rate, return_tensors='pt', padding=True).to(device)
 
         with torch.no_grad():
             logits = model(**inputs).logits
@@ -78,6 +59,9 @@ def transcribe_from_audio_path_with_lm_vad(audio_path, model_id="viktor-enzell/w
         }
         #print(transcription)
         transcriptions.append(full_transcript)
+
+    if converted:
+        os.remove(audio_path)
 
     return transcriptions
 
