@@ -8,7 +8,7 @@ import json
 from pyannote.audio.pipelines import VoiceActivityDetection
 # from language_files import get_model
 
-pipeline = VoiceActivityDetection(segmentation="pyannote/segmentation")
+pipeline = VoiceActivityDetection(segmentation="pyannote/segmentation")  # pip install https://github.com/pyannote/pyannote-audio/archive/develop.zip
 
 
 language_dict = {

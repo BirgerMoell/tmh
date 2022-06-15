@@ -1,3 +1,4 @@
+import torch
 from transformers import Wav2Vec2Processor, Wav2Vec2Model
 import soundfile as sf
 import numpy as np
