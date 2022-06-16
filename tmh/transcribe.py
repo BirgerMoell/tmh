@@ -3,10 +3,14 @@ from xdrlib import ConversionError
 import torchaudio
 import torch
 from itertools import groupby
-from transformers import Wav2Vec2Processor, Wav2Vec2ForCTC
+from transformers import Wav2Vec2Processor, Wav2Vec2ForCTC, Wav2Vec2ProcessorWithLM
 from transformers import HubertForSequenceClassification, Wav2Vec2FeatureExtractor
 from transformers import pipeline
 import librosa
+from tmh.utils import ensure_wav, load_audio
+from tmh.language_files import get_model
+from tmh.transcribe_with_vad import transcribe_from_audio_path_split_on_speech
+from tmh.transcribe_with_lm import transcribe_from_audio_path_with_lm, transcribe_from_audio_path_with_lm_vad
 
 from speechbrain.pretrained import EncoderClassifier
 from typing import Any
@@ -14,50 +18,99 @@ import soundfile as sf
 import os
 import numpy as np
 
-# from language_files import get_model
 
 
 class ConversionError(Exception):
     pass
 
 
-language_dict = {
-    "Swedish": "KBLab/wav2vec2-large-voxrex-swedish",
-    "English": "jonatasgrosman/wav2vec2-large-xlsr-53-english",
-    "Russian": "jonatasgrosman/wav2vec2-large-xlsr-53-russian",
-    "Spanish": "facebook/wav2vec2-large-xlsr-53-spanish",
-    "French": "facebook/wav2vec2-large-xlsr-53-french",
-    "Persian": "m3hrdadfi/wav2vec2-large-xlsr-persian",
-    "Dutch": "facebook/wav2vec2-large-xlsr-53-dutch",
-    "Portugese": "facebook/wav2vec2-large-xlsr-53-portuguese",
-    "Chinese": "jonatasgrosman/wav2vec2-large-xlsr-53-chinese-zh-cn",
-    "German": "jonatasgrosman/wav2vec2-large-xlsr-53-german",
-    "Greek": "lighteternal/wav2vec2-large-xlsr-53-greek",
-    "Hindi": "theainerd/Wav2Vec2-large-xlsr-hindi",
-    "Italian": "jonatasgrosman/wav2vec2-large-xlsr-53-italian",
-    "Turkish": "cahya/wav2vec2-base-turkish-artificial-cv",
-    "Vietnamese": "leduytan93/Fine-Tune-XLSR-Wav2Vec2-Speech2Text-Vietnamese",
-    "Catalan": "ccoreilly/wav2vec2-large-100k-voxpopuli-catala",
-    "Japanese": "vumichien/wav2vec2-large-xlsr-japanese-hiragana",
-    "Tamil": "vumichien/wav2vec2-large-xlsr-japanese-hiragana",
-    "Indonesian": "indonesian-nlp/wav2vec2-large-xlsr-indonesian",
-    "Dhivevi": "shahukareem/wav2vec2-large-xlsr-53-dhivehi",
-    "Polish": "jonatasgrosman/wav2vec2-large-xlsr-53-polish",
-    "Thai": "sakares/wav2vec2-large-xlsr-thai-demo",
-    "Hebrew": "imvladikon/wav2vec2-large-xlsr-53-hebrew",
-    "Mongolian": "sammy786/wav2vec2-large-xlsr-mongolian",
-    "Czech": "arampacha/wav2vec2-large-xlsr-czech",
-    "Icelandic": "m3hrdadfi/wav2vec2-large-xlsr-icelandic",
-    "Irish": "jimregan/wav2vec2-large-xlsr-irish-basic",
-    "Kinyarwanda": "lucio/wav2vec2-large-xlsr-kinyarwanda",
-    "Lithuanian": "DeividasM/wav2vec2-large-xlsr-53-lithuanian",
-    "Hungarian": "jonatasgrosman/wav2vec2-large-xlsr-53-hungarian",
-    "Finnish": "aapot/wav2vec2-large-xlsr-53-finnish"
-}
-
-# to do
-# chech language
+# TODO
+# check language
 # enable batch mode
+
+
+class TranscribeModel:
+    def __init__(self, use_vad=False, use_lm=False, language='Swedish', model_id=None):
+        """
+        use_vad: use voice activity detection
+        use_lm: use language model
+        language: language to use
+        model_id: the name of a HuggingFace model, overrides `language`
+
+        return: a TranscribeModel object
+        """
+        self.language = language
+        self.use_vad = use_vad
+        self.use_lm = use_lm
+        self.model_id = model_id if model_id else self.get_model_id()
+        self.device = torch.device(
+            'cuda' if torch.cuda.is_available() else 'cpu')
+        if use_vad and use_lm:
+            self.processor = Wav2Vec2ProcessorWithLM.from_pretrained(self.model_id)
+            self.model = Wav2Vec2ForCTC.from_pretrained(
+                self.model_id).to(self.device)
+            print("Using LM+VAD")
+        elif use_vad:
+            self.processor = Wav2Vec2Processor.from_pretrained(self.model_id)
+            self.model = Wav2Vec2ForCTC.from_pretrained(
+                self.model_id).to(self.device)
+            print("Using VAD")
+        elif use_lm:
+            self.processor = Wav2Vec2ProcessorWithLM.from_pretrained(
+                self.model_id)
+            self.model = Wav2Vec2ForCTC.from_pretrained(
+                self.model_id).to(self.device)
+            print("Using LM")
+        else:
+            self.processor = Wav2Vec2Processor.from_pretrained(self.model_id)
+            self.model = Wav2Vec2ForCTC.from_pretrained(
+                self.model_id).to(self.device)
+        print("Model was initialized with model_id: {}".format(self.model_id))
+
+    def get_model_id(self):
+        if self.use_lm:
+            if self.language == "Swedish":
+                return "viktor-enzell/wav2vec2-large-voxrex-swedish-4gram"
+            else:
+                raise ValueError(
+                    "Language not supported for LM: {}".format(self.language))
+        else:
+            return get_model(self.language)
+
+    def transcribe(self, audio_path, classify_emotion=False, output_word_offsets=False, save_to_file=False, reduce_noise=False, output_format: str = "json"):
+        """
+        audio_path: path to audio file
+        classify_emotion: whether to classify emotion or not (not yet implemented) # TODO
+        output_word_offsets: whether to output word offsets or not (not yet implemented) # TODO
+        save_to_file: whether to save to file or not
+        reduce_noise: whether to reduce noise or not
+        output_format: the format of the output, either "json" or "text"
+
+        return: transcriptions in the format specified by output_format (default: json)
+        """
+        if self.use_vad and self.use_lm:
+            return transcribe_from_audio_path_with_lm_vad(
+                audio_path=audio_path,
+                model=self.model,
+                processor=self.processor)
+        elif self.use_vad:
+            return transcribe_from_audio_path_split_on_speech(
+                audio_path,
+                save_to_file=save_to_file,
+                output_format=output_format,
+                model=self.model,
+                processor=self.processor)
+        elif self.use_lm:
+            return transcribe_from_audio_path_with_lm(
+                audio_path, model=self.model, processor=self.processor).lower()
+        else:
+            return transcribe_from_audio_path(
+                audio_path=audio_path,
+                model=self.model,
+                processor=self.processor,
+                reduce_noise=reduce_noise,
+                classify_emotion=classify_emotion,
+                output_word_offsets=output_word_offsets)
 
 
 def extract_speaker_embedding(audio_path):
@@ -68,16 +121,10 @@ def extract_speaker_embedding(audio_path):
     # print(embeddings)
     return embeddings
 
-
-def change_sample_rate(audio_path, new_sample_rate=16000):
-    audio_to_resample, sr = librosa.load(audio_path)
-    resampled_audio = librosa.resample(
-        audio_to_resample, orig_sr=sr, target_sr=new_sample_rate)
-    resampled_tensor = torch.tensor(np.array([resampled_audio]))
-    return resampled_tensor
-
-
+  
 def classify_emotion(audio_path):
+    audio_path, converted = ensure_wav(audio_path)
+
     model = HubertForSequenceClassification.from_pretrained(
         "superb/hubert-large-superb-er")
     feature_extractor = Wav2Vec2FeatureExtractor.from_pretrained(
@@ -91,6 +138,8 @@ def classify_emotion(audio_path):
     predicted_ids = torch.argmax(logits, dim=-1)
     labels = [model.config.id2label[_id] for _id in predicted_ids.tolist()]
     # print(labels)
+    if converted:
+        os.remove(audio_path)
     return(labels)
 
 
@@ -99,15 +148,6 @@ def classify_language(audio_path):
         source="speechbrain/lang-id-commonlanguage_ecapa", savedir="pretrained_models/lang-id-commonlanguage_ecapa")
     out_prob, score, index, text_lab = classifier.classify_file(audio_path)
     return(text_lab[0])
-
-
-def convert_to_wav(audio_path):
-    path = audio_path.split("/")
-    filename = path[-1].split(".")[0]
-    audio, sr = librosa.load(audio_path)
-    wav_path = f'{filename}.wav'
-    sf.write(wav_path, audio, sr, subtype='PCM_24')
-    return wav_path
 
 
 def get_speech_rate_time_stamps(time_stamps, downsample=320, sample_rate=16000):
@@ -166,67 +206,55 @@ def get_speech_rate_variability(time_stamps, type='char', downsample=320, sample
     return averages, stds, variances
 
 
-def transcribe_from_audio_path(audio_path, language='Swedish', check_language=False, classify_emotion=False, model="", output_word_offsets=False, language_model=False):
-    converted = False
-    if audio_path[-4:] != ".wav":
-        try:
-            audio_path = convert_to_wav(audio_path)
-            converted = True
-        except:
-            raise ConversionError(f"Could not convert {audio_path} to wav")
+def transcribe_from_audio_path(audio_path, model=None, processor=None, model_id=None, language='Swedish', check_language=False, reduce_noise=False, classify_emotion=False, output_word_offsets=False):
+    audio_path, converted = ensure_wav(audio_path, reduce_noise=reduce_noise)
 
-    waveform, sample_rate = torchaudio.load(audio_path)
-    if sample_rate != 16000:
-        # resample to 16000 Hz
-        waveform = change_sample_rate(audio_path)
-        sample_rate = 16000
+    sample_rate = 16000
 
     if converted:
         os.remove(audio_path)
 
-    if check_language:
-        language = classify_language(audio_path)
+    if not (model and processor) and not model_id:
+        if check_language:
+            language = classify_language(audio_path)
         # print("the language is", language)
-        try:
-            model_id = language_dict[language]
-        except KeyError:
-            print("No language model found for %s. Defaulting to KBLab/wav2vec2-large-voxrex-swedish unless another model was specified." % language)
-            model_id = "KBLab/wav2vec2-large-voxrex-swedish"
+        model_id = get_model(language)
+
+    if not (model and processor):
+        device = torch.device(
+            'cuda' if torch.cuda.is_available() else 'cpu')
+        processor = Wav2Vec2Processor.from_pretrained(model_id)
+        model = Wav2Vec2ForCTC.from_pretrained(model_id).to(device)
     else:
-        try:
-            model_id = language_dict[language]
-        except KeyError:
-            print("No language model found for %s. Defaulting to KBLab/wav2vec2-large-voxrex-swedish unless another model was specified." % language)
-            model_id = "KBLab/wav2vec2-large-voxrex-swedish"
+        device = model.device
 
-    if model:
-        model_id = model
+    transcript = ""
+    # Ensure that the sample rate is 16k
 
-    processor = Wav2Vec2Processor.from_pretrained(model_id)
-    model = Wav2Vec2ForCTC.from_pretrained(model_id)
-    with torch.no_grad():
-        logits = model(waveform).logits
-    pred_ids = torch.argmax(logits, dim=-1)
+    # Stream over 30 seconds chunks rather than load the full file
+    stream = librosa.stream(
+        audio_path,
+        block_length=30,
+        frame_length=sample_rate,
+        hop_length=sample_rate
+    )
 
-    if output_word_offsets:
-        outputs = processor.batch_decode(
-            pred_ids, output_word_offsets=output_word_offsets)
-        transcription = outputs["text"][0]
-        token_time_stamps = outputs[1]
-        speech_rate = get_speech_rate_time_stamps(token_time_stamps)
-        averages, stds, variances = get_speech_rate_variability(
-            token_time_stamps, type="char")
-        word_time_stamps = outputs[2]
-        return {
-            "transcription": transcription,
-            "speech_rate": speech_rate,
-            "averages": averages,
-            "standard_deviations": stds,
-            "variances": variances
-        }
-    else:
-        transcription = processor.batch_decode(pred_ids)
-        return transcription[0]
+    for speech in stream:
+        if len(speech.shape) > 1:
+            speech = speech[:, 0] + speech[:, 1]
+
+        input_values = processor(speech, sampling_rate=sample_rate, return_tensors="pt").input_values.to(device)
+        logits = model(input_values).logits
+
+        predicted_ids = torch.argmax(logits, dim=-1)
+        transcription = processor.decode(predicted_ids[0])
+        transcript += transcription.lower()
+        # print(transcription[0])
+
+    if converted:
+        os.remove(audio_path)
+
+    return transcript
 
 
 def output_word_offset(pred_ids, processor, output_word_offsets):
@@ -246,9 +274,3 @@ def output_word_offset(pred_ids, processor, output_word_offsets):
         "variances": variances
     }
 
-
-# file_path = "/home/bmoell/tmh/tmh/test.wav"
-# output = transcribe_from_audio_path(file_path, "English", output_word_offsets=True)
-# print("the output is", output)
-# transcription = "Det visste i varje fall näsan."
-# print("the transcription is", transcription)
