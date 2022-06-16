@@ -72,4 +72,7 @@ def transcribe_from_audio_path_with_lm_vad(audio_path, model_id="viktor-enzell/w
         # print(transcription)
         transcriptions.append(full_transcript)
 
+    if converted:
+        os.remove(audio_path)
+
     return transcriptions

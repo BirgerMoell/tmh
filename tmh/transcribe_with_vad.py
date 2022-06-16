@@ -14,7 +14,6 @@ from pyannote.audio.pipelines import VoiceActivityDetection
 # pip install https://github.com/pyannote/pyannote-audio/archive/develop.zip
 pipeline = VoiceActivityDetection(segmentation="pyannote/segmentation")
 
-
 language_dict = {
     "Swedish": "KBLab/wav2vec2-large-voxrex-swedish",
     "English": "jonatasgrosman/wav2vec2-large-xlsr-53-english",
