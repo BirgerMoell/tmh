@@ -25,7 +25,6 @@ def change_sample_rate(audio_path: str, new_sample_rate: int = 16000):
     resampled_tensor = torch.tensor([resampled_audio])
     return resampled_tensor
 
-
 def ensure_sample_rate(audio_path: str, sample_rate: int, new_sample_rate: int = 16000):
     """
     Ensure that an audio file is in the specified sample rate. If not, convert it.
@@ -39,7 +38,6 @@ def ensure_sample_rate(audio_path: str, sample_rate: int, new_sample_rate: int =
     else:
         waveform, _ = torchaudio.load(audio_path)
     return waveform
-
 
 def load_audio(audio_path: str, sample_rate: int = 16000):
     waveform, orig_sample_rate = torchaudio.load(audio_path)

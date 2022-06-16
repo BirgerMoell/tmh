@@ -19,6 +19,7 @@ import os
 import numpy as np
 
 
+
 class ConversionError(Exception):
     pass
 
@@ -120,7 +121,7 @@ def extract_speaker_embedding(audio_path):
     # print(embeddings)
     return embeddings
 
-
+  
 def classify_emotion(audio_path):
     audio_path, converted = ensure_wav(audio_path)
 
@@ -272,3 +273,4 @@ def output_word_offset(pred_ids, processor, output_word_offsets):
         "standard_deviations": stds,
         "variances": variances
     }
+
