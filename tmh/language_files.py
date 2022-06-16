@@ -35,17 +35,10 @@ LANGUAGE_DICT = {
 
 
 def get_model(language: str):
-    try:
-        model_id = LANGUAGE_DICT.get(language)
-    except KeyError:
+    model_id = LANGUAGE_DICT.get(language)
+    if not model_id:
         print("No language model found for %s. Defaulting to KBLab/wav2vec2-large-voxrex-swedish unless another model was specified." % language)
         model_id = "KBLab/wav2vec2-large-voxrex-swedish"
-    else:
-        try:
-            model_id = LANGUAGE_DICT.get(language)
-        except KeyError:
-            print("No language model found for %s. Defaulting to KBLab/wav2vec2-large-voxrex-swedish unless another model was specified." % language)
-            model_id = "KBLab/wav2vec2-large-voxrex-swedish"
     return model_id
 
 
