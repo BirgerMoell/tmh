@@ -1,5 +1,5 @@
 
-language_dict = {
+LANGUAGE_DICT = {
     "Swedish": "KBLab/wav2vec2-large-voxrex-swedish",
     "English": "jonatasgrosman/wav2vec2-large-xlsr-53-english",
     "Russian": "jonatasgrosman/wav2vec2-large-xlsr-53-russian",
@@ -31,9 +31,22 @@ language_dict = {
     "Lithuanian": "DeividasM/wav2vec2-large-xlsr-53-lithuanian",
     "Hungarian": "jonatasgrosman/wav2vec2-large-xlsr-53-hungarian",
     "Finnish": "aapot/wav2vec2-large-xlsr-53-finnish"
-    }
+}
 
-def get_model(language):
-    return language_dict[language]
+
+def get_model(language: str):
+    try:
+        model_id = LANGUAGE_DICT.get(language)
+    except KeyError:
+        print("No language model found for %s. Defaulting to KBLab/wav2vec2-large-voxrex-swedish unless another model was specified." % language)
+        model_id = "KBLab/wav2vec2-large-voxrex-swedish"
+    else:
+        try:
+            model_id = LANGUAGE_DICT.get(language)
+        except KeyError:
+            print("No language model found for %s. Defaulting to KBLab/wav2vec2-large-voxrex-swedish unless another model was specified." % language)
+            model_id = "KBLab/wav2vec2-large-voxrex-swedish"
+    return model_id
+
 
 language_list = "Arabic, Basque, Breton, Catalan, Chinese_China, Chinese_Hongkong, Chinese_Taiwan, Chuvash, Czech, Dhivehi, Dutch, English, Esperanto, Estonian, French, Frisian, Georgian, German, Greek, Hakha_Chin, Indonesian, Interlingua, Italian, Japanese, Kabyle, Kinyarwanda, Kyrgyz, Latvian, Maltese, Mangolian, Persian, Polish, Portuguese, Romanian, Romansh_Sursilvan, Russian, Sakha, Slovenian, Spanish, Swedish, Tamil, Tatar, Turkish, Ukranian, Welsh"

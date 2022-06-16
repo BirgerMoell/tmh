@@ -15,14 +15,14 @@ LONG_DESCRIPTION = 'A package for TMH Speech'
 setup(
     name="tmh",
     version=VERSION,
-    author="Birger Moell, Ambika Kirkland, Johan Boye, Harm Lameris",
+    author="Birger Moell, Ambika Kirkland, Johan Boye, Harm Lameris, August Erseus",
     author_email="<bmoell@kth.se>",
     description=DESCRIPTION,
     long_description_content_type="text/markdown",
     long_description=long_description,
     packages=find_packages(),
     install_requires=['transformers', 'torch', 'torchaudio', 'speechbrain',
-                      'librosa', 'numpy', 'scipy', 'unidecode', 'inflect', 'librosa', 'python-dotenv', 'deep-phonemizer', 'argparse', 'pydub', 'pyctcdecode'],
+                      'librosa', 'noisereduce', 'numpy', 'scipy', 'unidecode', 'inflect', 'librosa', 'python-dotenv', 'deep-phonemizer', 'argparse', 'pydub', 'pyctcdecode'],
     keywords=['python', 'speech', 'voice', 'nlp'],
     classifiers=[
         "Development Status :: 1 - Planning",
@@ -33,5 +33,3 @@ setup(
         "Operating System :: Microsoft :: Windows",
     ]
 )
-
-
