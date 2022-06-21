@@ -107,7 +107,8 @@ def transcribe_from_audio_path_split_on_speech(audio_path, language="Swedish", m
         device = model.device
 
     for segment in segments['content']:
-        x = waveform[:, int(segment['segment']['start']*sample_rate): int(segment['segment']['end']*sample_rate)]
+        x = waveform[:, int(segment['segment']['start']*sample_rate)
+                            : int(segment['segment']['end']*sample_rate)]
         with torch.no_grad():
             logits = model(x).logits
         pred_ids = torch.argmax(logits, dim=-1)
@@ -142,6 +143,13 @@ def transcribe_from_audio_path_split_on_speech(audio_path, language="Swedish", m
             result += transcription
             result += '\n\n'
             subtitle_id += 1
+
+    elif output_format == "str_dots":
+        result = ". ".join([t["transcription"] for t in transcriptions])
+
+    elif output_format == "str":
+        result = " ".join([t["transcription"] for t in transcriptions])
+
     if save_to_file:
         f = open(save_to_file, "w")
         f.write(result)
