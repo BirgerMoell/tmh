@@ -1,6 +1,7 @@
 """
 Utils handy for speech processing etc
 """
+from io import BytesIO
 import librosa
 import torch
 import soundfile as sf
@@ -45,6 +46,9 @@ def load_audio(audio_path: str, sample_rate: int = 16000):
         audio_path, orig_sample_rate, new_sample_rate=sample_rate)
     return waveform
 
+def caf_bytes_to_wav(caf_bytes, file="test.wav"):
+    audio, sr = librosa.load(BytesIO(caf_bytes))
+    sf.write(file, audio, sr, subtype='PCM_24')
 
 def convert_to_wav(audio_path: str, output_path: str = None):
     """

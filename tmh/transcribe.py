@@ -1,20 +1,17 @@
 import asyncio
+import io
 from lib2to3.pytree import convert
-from xdrlib import ConversionError
 import torchaudio
 import torch
-from itertools import groupby
 from transformers import Wav2Vec2Processor, Wav2Vec2ForCTC, Wav2Vec2ProcessorWithLM
 from transformers import HubertForSequenceClassification, Wav2Vec2FeatureExtractor
-from transformers import pipeline
 import librosa
-from tmh.utils import ensure_sample_rate, ensure_wav, load_audio
+from tmh.utils import ensure_wav
 from tmh.language_files import get_model
-from tmh.transcribe_with_vad import transcribe_from_audio_path_split_on_speech
-from tmh.transcribe_with_lm import transcribe_from_audio_path_with_lm, transcribe_from_audio_path_with_lm_vad
+from tmh.transcribe_with_vad import transcribe_bytes_split_on_speech, transcribe_from_audio_path_split_on_speech
+from tmh.transcribe_with_lm import transcribe_bytes_with_lm, transcribe_bytes_with_lm_vad, transcribe_from_audio_path_with_lm, transcribe_from_audio_path_with_lm_vad
 
 from speechbrain.pretrained import EncoderClassifier
-from typing import Any
 import soundfile as sf
 import os
 import numpy as np
@@ -113,7 +110,7 @@ class TranscribeModel:
                 classify_emotion=classify_emotion,
                 output_word_offsets=output_word_offsets)
 
-    def transcribe_chunk(self, data, sample_rate, output_format: str = "json"):
+    def transcribe_bytes(self, bytes, output_format: str = "json"):
         """
         Transcribes a chunk of speech.
 
@@ -121,27 +118,28 @@ class TranscribeModel:
 
         @return: transcriptions in the format specified by output_format (default: json | text)
         """
-        print("Transcribing data")
-
-        # Ensure that the sample rate is 16k
-        sr = 16000
-        speech = data
-        if len(speech.shape) > 1:
-            speech = speech[:, 0] + speech[:, 1]
-
-        input_values = self.processor(
-            speech, sampling_rate=sample_rate, return_tensors="pt").input_values.to(self.device)
-        logits = self.model(input_values).logits
-
-        predicted_ids = torch.argmax(logits, dim=-1)
-        transcription = self.processor.decode(predicted_ids[0])
-        transcript = transcription.lower()
-        print(transcript)
-
-        if output_format == "json":
-            return {"transcription": transcript}
-        elif output_format == "text":
-            return transcript
+        if self.use_vad and self.use_lm:
+            return transcribe_bytes_with_lm_vad(
+                bytes=bytes,
+                model=self.model,
+                processor=self.processor,
+                output_format=output_format)
+        elif self.use_vad:
+            return transcribe_bytes_split_on_speech(
+                bytes=bytes,
+                model=self.model,
+                processor=self.processor,
+                output_format=output_format)
+        elif self.use_lm:
+            return transcribe_bytes_with_lm(
+                bytes=bytes,
+                model=self.model,
+                processor=self.processor).lower()
+        else:
+            return transcribe_bytes(
+                bytes=bytes,
+                model=self.model,
+                processor=self.processor)
 
 
 def extract_speaker_embedding(audio_path):
@@ -280,20 +278,16 @@ def transcribe_from_audio_path(audio_path, model=None, processor=None, model_id=
         transcript += transcription.lower()
         # print(transcription[0])
 
-    return transcript
-
-
-def transcribe_from_stream(audio_path, model=None, processor=None, model_id=None, language='Swedish', check_language=False, reduce_noise=False, classify_emotion=False, output_word_offsets=False):
-    audio_path, converted = ensure_wav(audio_path, reduce_noise=reduce_noise)
-
-    sample_rate = 16000
-
     if converted:
         os.remove(audio_path)
 
+    return transcript
+
+
+def transcribe_bytes(bytes, model=None, processor=None, model_id=None, language='Swedish'):
+    speech, sample_rate = sf.load(io.BytesIO(bytes))
+
     if not (model and processor) and not model_id:
-        if check_language:
-            language = classify_language(audio_path)
         # print("the language is", language)
         model_id = get_model(language)
 
@@ -308,29 +302,17 @@ def transcribe_from_stream(audio_path, model=None, processor=None, model_id=None
     transcript = ""
     # Ensure that the sample rate is 16k
 
-    # Stream over 30 seconds chunks rather than load the full file
-    stream = librosa.stream(
-        audio_path,
-        block_length=30,
-        frame_length=sample_rate,
-        hop_length=sample_rate
-    )
+    if len(speech.shape) > 1:
+        speech = speech[:, 0] + speech[:, 1]
 
-    for speech in stream:
-        if len(speech.shape) > 1:
-            speech = speech[:, 0] + speech[:, 1]
+    input_values = processor(
+        speech, sampling_rate=sample_rate, return_tensors="pt").input_values.to(device)
+    logits = model(input_values).logits
 
-        input_values = processor(
-            speech, sampling_rate=sample_rate, return_tensors="pt").input_values.to(device)
-        logits = model(input_values).logits
-
-        predicted_ids = torch.argmax(logits, dim=-1)
-        transcription = processor.decode(predicted_ids[0])
-        transcript += transcription.lower()
-        # print(transcription[0])
-
-    if converted:
-        os.remove(audio_path)
+    predicted_ids = torch.argmax(logits, dim=-1)
+    transcription = processor.decode(predicted_ids[0])
+    transcript += transcription.lower()
+    # print(transcription[0])
 
     return transcript
 
