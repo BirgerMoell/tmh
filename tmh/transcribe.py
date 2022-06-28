@@ -1,6 +1,7 @@
 import asyncio
 import io
 from lib2to3.pytree import convert
+import logging
 import torchaudio
 import torch
 from transformers import Wav2Vec2Processor, Wav2Vec2ForCTC, Wav2Vec2ProcessorWithLM
@@ -18,6 +19,9 @@ import numpy as np
 
 
 class ConversionError(Exception):
+    pass
+
+class TranscriptionError(Exception):
     pass
 
 
@@ -86,29 +90,33 @@ class TranscribeModel:
 
         return: transcriptions in the format specified by output_format (default: json)
         """
-        if self.use_vad and self.use_lm:
-            return transcribe_from_audio_path_with_lm_vad(
-                audio_path=audio_path,
-                model=self.model,
-                processor=self.processor)
-        elif self.use_vad:
-            return transcribe_from_audio_path_split_on_speech(
-                audio_path,
-                save_to_file=save_to_file,
-                output_format=output_format,
-                model=self.model,
-                processor=self.processor)
-        elif self.use_lm:
-            return transcribe_from_audio_path_with_lm(
-                audio_path, model=self.model, processor=self.processor).lower()
-        else:
-            return transcribe_from_audio_path(
-                audio_path=audio_path,
-                model=self.model,
-                processor=self.processor,
-                reduce_noise=reduce_noise,
-                classify_emotion=classify_emotion,
-                output_word_offsets=output_word_offsets)
+        try:
+            if self.use_vad and self.use_lm:
+                return transcribe_from_audio_path_with_lm_vad(
+                    audio_path=audio_path,
+                    model=self.model,
+                    processor=self.processor)
+            elif self.use_vad:
+                return transcribe_from_audio_path_split_on_speech(
+                    audio_path,
+                    save_to_file=save_to_file,
+                    output_format=output_format,
+                    model=self.model,
+                    processor=self.processor)
+            elif self.use_lm:
+                return transcribe_from_audio_path_with_lm(
+                    audio_path, model=self.model, processor=self.processor).lower()
+            else:
+                return transcribe_from_audio_path(
+                    audio_path=audio_path,
+                    model=self.model,
+                    processor=self.processor,
+                    reduce_noise=reduce_noise,
+                    classify_emotion=classify_emotion,
+                    output_word_offsets=output_word_offsets)
+        except Exception as e:
+            logging.error(e)
+            raise TranscriptionError(e)
 
     def transcribe_bytes(self, bytes, output_format: str = "json"):
         """
