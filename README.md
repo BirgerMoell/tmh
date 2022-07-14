@@ -1,5 +1,16 @@
-# TMH Speech
-TMH Speech is a library that gives access to open source models for transcription.
+# TMH
+TMH is a library that gives access to open source tools for working with speech and language. 
+
+## Tasks
+-- Transcription
+-- Audio embeddings (Wav2vec2)
+-- Phoneme extraction
+-- Text embeddings (BERT)
+-- Speaker diarization
+-- Text generation
+-- Text summarization
+
+The package is focused on solving common problems in speech and language with an easy API where we take care of making sure that the functions gives you good results, and you don't have to worry about the details (but can check everything since it's all open source!).
 
 ## Read the docs
 https://tmh-docs.readthedocs.io/en/latest/docs.html#getting-started
