@@ -1,7 +1,7 @@
 import asyncio
 import io
-from lib2to3.pytree import convert
 import logging
+import multiprocessing
 import torchaudio
 import torch
 from transformers import Wav2Vec2Processor, Wav2Vec2ForCTC, Wav2Vec2ProcessorWithLM
@@ -17,9 +17,12 @@ import soundfile as sf
 import os
 import numpy as np
 
+logger = logging.getLogger()
+
 
 class ConversionError(Exception):
     pass
+
 
 class TranscriptionError(Exception):
     pass
@@ -28,6 +31,8 @@ class TranscriptionError(Exception):
 # TODO
 # check language
 # enable batch mode
+
+PROCESSES = multiprocessing.cpu_count() - 1
 
 
 class TranscribeModel:
@@ -44,42 +49,71 @@ class TranscribeModel:
         self.use_vad = use_vad
         self.use_lm = use_lm
         self.model_id = model_id if model_id else self.get_model_id()
+        # self.task_queue = multiprocessing.Queue() # TODO
+        self.processes = []
         self.device = torch.device(
             'cuda' if torch.cuda.is_available() else 'cpu')
-        if use_vad and use_lm:
+        self.model, self.processor = self.initialize()
+        # self.run() # TODO
+
+    def run(self):
+        while True:
+            while len(self.processes) < PROCESSES:
+                self.processes.append(
+                    multiprocessing.Process(target=self.worker, kwargs={}))
+                self.processes[-1].start()
+
+    def worker(self, **kwargs):
+        self.transcribe(**kwargs)
+
+    def initialize(self):
+        if self.use_vad and self.use_lm:
             self.processor = Wav2Vec2ProcessorWithLM.from_pretrained(
                 self.model_id)
             self.model = Wav2Vec2ForCTC.from_pretrained(
                 self.model_id).to(self.device)
-            print("Using LM+VAD")
-        elif use_vad:
+            logger.info("Using LM+VAD")
+        elif self.use_vad:
             self.processor = Wav2Vec2Processor.from_pretrained(self.model_id)
             self.model = Wav2Vec2ForCTC.from_pretrained(
                 self.model_id).to(self.device)
-            print("Using VAD")
-        elif use_lm:
+            logger.info("Using VAD")
+        elif self.use_lm:
             self.processor = Wav2Vec2ProcessorWithLM.from_pretrained(
                 self.model_id)
             self.model = Wav2Vec2ForCTC.from_pretrained(
                 self.model_id).to(self.device)
-            print("Using LM")
+            logger.info("Using LM")
         else:
             self.processor = Wav2Vec2Processor.from_pretrained(self.model_id)
             self.model = Wav2Vec2ForCTC.from_pretrained(
                 self.model_id).to(self.device)
-        print("Model was initialized with model_id: {}".format(self.model_id))
+        logger.info(
+            "Model was initialized with model_id: {}".format(self.model_id))
+        return self.model, self.processor
 
     def get_model_id(self):
+        logger.info("getting model id")
         if self.use_lm:
             if self.language == "Swedish":
+                logger.info("Using Swedish LM")
                 return "viktor-enzell/wav2vec2-large-voxrex-swedish-4gram"
             else:
+                logger.error(
+                    "Language not supported for LM: {}".format(self.language))
                 raise ValueError(
                     "Language not supported for LM: {}".format(self.language))
         else:
             return get_model(self.language)
 
-    def transcribe(self, audio_path, classify_emotion=False, output_word_offsets=False, save_to_file=False, reduce_noise=False, output_format: str = "json"):
+    def transcribe(
+            self,
+            audio_path,
+            classify_emotion=False,
+            output_word_offsets=False,
+            save_to_file=False,
+            reduce_noise=False,
+            output_format: str = "json"):
         """
         audio_path: path to audio file
         classify_emotion: whether to classify emotion or not (not yet implemented) # TODO
@@ -90,13 +124,17 @@ class TranscribeModel:
 
         return: transcriptions in the format specified by output_format (default: json)
         """
+        logger.info("Transcribing {}".format(audio_path))
         try:
             if self.use_vad and self.use_lm:
+                logger.info("Using LM+VAD")
                 return transcribe_from_audio_path_with_lm_vad(
                     audio_path=audio_path,
                     model=self.model,
-                    processor=self.processor)
+                    processor=self.processor,
+                    output_format=output_format)
             elif self.use_vad:
+                logger.info("Using VAD")
                 return transcribe_from_audio_path_split_on_speech(
                     audio_path,
                     save_to_file=save_to_file,
@@ -104,9 +142,11 @@ class TranscribeModel:
                     model=self.model,
                     processor=self.processor)
             elif self.use_lm:
+                logger.info("Using LM")
                 return transcribe_from_audio_path_with_lm(
                     audio_path, model=self.model, processor=self.processor).lower()
             else:
+                logger.info("Using neither LM nor VAD")
                 return transcribe_from_audio_path(
                     audio_path=audio_path,
                     model=self.model,
@@ -115,8 +155,11 @@ class TranscribeModel:
                     classify_emotion=classify_emotion,
                     output_word_offsets=output_word_offsets)
         except Exception as e:
-            logging.error(e)
+            logger.error(e)
             raise TranscriptionError(e)
+
+    def queue_transcription(self, audio_path, *args):
+        self.task_queue.put((audio_path, *args))
 
     def transcribe_bytes(self, bytes, output_format: str = "json"):
         """
@@ -148,6 +191,18 @@ class TranscribeModel:
                 bytes=bytes,
                 model=self.model,
                 processor=self.processor)
+
+    def process_tasks(self):
+        logger = multiprocessing.get_logger()
+        proc = os.getpid()
+        while not self.task_queue.empty():
+            try:
+                (audio, *args) = self.task_queue.get()
+                self.transcribe(audio, *args)
+            except Exception as e:
+                logger.error(e)
+            logger.info(f"Process {proc} completed successfully")
+        return True
 
 
 def extract_speaker_embedding(audio_path):
@@ -341,3 +396,10 @@ def output_word_offset(pred_ids, processor, output_word_offsets):
         "standard_deviations": stds,
         "variances": variances
     }
+
+
+if __name__ == "__main__":
+    path = "word1.wav"
+    t = TranscribeModel(use_lm=True)
+    transcript = t.transcribe(path)
+    print(transcript)

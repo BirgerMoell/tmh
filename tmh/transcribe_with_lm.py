@@ -37,7 +37,7 @@ def transcribe_from_audio_path_with_lm(audio_path, model_id="viktor-enzell/wav2v
     return transcripts[0]
 
 
-def transcribe_from_audio_path_with_lm_vad(audio_path, model_id="viktor-enzell/wav2vec2-large-voxrex-swedish-4gram", model=None, processor=None, output_format='json'):
+def transcribe_from_audio_path_with_lm_vad(audio_path, model_id="viktor-enzell/wav2vec2-large-voxrex-swedish-4gram", model=None, processor=None, output_format='text'):
     audio_path, converted = ensure_wav(audio_path)
 
     sample_rate = 16000
@@ -45,9 +45,6 @@ def transcribe_from_audio_path_with_lm_vad(audio_path, model_id="viktor-enzell/w
 
     segments = extract_speak_segments(audio_path)
     transcriptions = []
-
-    if converted:
-        os.remove(audio_path)
 
     if not (model and processor):
         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -77,7 +74,7 @@ def transcribe_from_audio_path_with_lm_vad(audio_path, model_id="viktor-enzell/w
     if converted:
         os.remove(audio_path)
 
-    if output_format == "str_dots":
+    if output_format == "text":
         result = ". ".join([t["transcription"] for t in transcriptions])
 
     elif output_format == "str":
