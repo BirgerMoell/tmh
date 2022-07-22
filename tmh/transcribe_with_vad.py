@@ -1,8 +1,8 @@
 # from vad import extract_speak_segments
+import io
 import os
-import torchaudio
 import torch
-import librosa
+import soundfile as sf
 from transformers import Wav2Vec2Processor, Wav2Vec2ForCTC
 import json
 from tmh.language_files import get_model
@@ -142,6 +142,95 @@ def transcribe_from_audio_path_split_on_speech(audio_path, language="Swedish", m
             result += transcription
             result += '\n\n'
             subtitle_id += 1
+
+    elif output_format == "str_dots":
+        result = ". ".join([t["transcription"] for t in transcriptions])
+
+    elif output_format == "str":
+        result = " ".join([t["transcription"] for t in transcriptions])
+
+    if save_to_file:
+        f = open(save_to_file, "w")
+        f.write(result)
+        f.close()
+    return result
+
+
+def transcribe_bytes_split_on_speech(bytes, language="Swedish", model_id="", save_to_file="", output_format="json", model=None, processor=None):
+    """
+    Creates a transcription of an audio file, and outputs the
+    result in one of the formats json (which is the default),
+    or srt.
+
+    If the 'save_to_file' parameter is set to a file name, the
+    results will also be written to file. 
+
+    The srt format can be used to create accurately timed subtitles 
+    for videos. If 'audio_path' is the audio track of a video file, 
+    a video player like VLC will create those subtitles automatically, 
+    given a file in the srt format.
+    """
+    waveform, sample_rate = sf.read(io.BytesIO(bytes))
+
+    segments = extract_speak_segments(bytes)  # TODO: ensure that this works
+    transcriptions = []
+
+    if not (model and processor) and not model_id:
+        # print("the language is", language)
+        model_id = get_model(language)
+
+    elif not (model and processor) and model_id:
+        device = torch.device(
+            'cuda' if torch.cuda.is_available() else 'cpu')
+        processor = Wav2Vec2Processor.from_pretrained(model_id)
+        model = Wav2Vec2ForCTC.from_pretrained(model_id).to(device)
+
+    else:
+        device = model.device
+
+    for segment in segments['content']:
+        x = waveform[:, int(segment['segment']['start']*sample_rate): int(segment['segment']['end']*sample_rate)]
+        with torch.no_grad():
+            logits = model(x).logits
+        pred_ids = torch.argmax(logits, dim=-1)
+        transcription = processor.batch_decode(pred_ids)
+        full_transcript = {
+            "transcription": transcription[0].encode('utf8').decode(),
+            "start": segment['segment']['start'],
+            "end": segment['segment']['end']
+        }
+        transcriptions.append(full_transcript)
+
+    d = {}
+    d['transcripts'] = transcriptions
+    result = ""
+    if output_format == 'json':
+        result = json.dumps(d,
+                            sort_keys=False,
+                            indent=4,
+                            ensure_ascii=False).encode('utf8').decode()
+    elif output_format == 'srt':
+        subtitle_id = 0
+        for item in transcriptions:
+            transcription = item['transcription']
+            start = item['start']
+            end = item['end']
+            result += str(subtitle_id)
+            result += '\n'
+            result += time_format(start)
+            result += ' --> '
+            result += time_format(end)
+            result += '\n'
+            result += transcription
+            result += '\n\n'
+            subtitle_id += 1
+
+    elif output_format == "str_dots":
+        result = ". ".join([t["transcription"] for t in transcriptions])
+
+    elif output_format == "str":
+        result = " ".join([t["transcription"] for t in transcriptions])
+
     if save_to_file:
         f = open(save_to_file, "w")
         f.write(result)
